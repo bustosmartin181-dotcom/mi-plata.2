@@ -16,46 +16,66 @@ jobs:
       - name: 1. Descargar repositorio
         uses: actions/checkout@v4
 
-      - name: 2. Verificar archivos del proyecto
+      - name: 2. Verificar y organizar archivos del proyecto
         run: |
+          # Si los archivos quedaron dentro de una subcarpeta al descomprimir, moverlos a la raíz
           if [ ! -f "package.json" ]; then
-            echo "::error::❌ ERROR: No se encontró package.json en el repositorio."
+            FOUND_PKG=$(find . -maxdepth 3 -name "package.json" -not -path "./package.json" | head -n 1)
+            if [ -n "$FOUND_PKG" ]; then
+              SOURCE_DIR=$(dirname "$FOUND_PKG")
+              echo "Detectada subcarpeta con el proyecto en: $SOURCE_DIR"
+              echo "Moviendo archivos a la raíz para compilar..."
+              cp -r "$SOURCE_DIR"/* . 2>/dev/null || true
+              cp -r "$SOURCE_DIR"/.* . 2>/dev/null || true
+            fi
+          fi
+
+          if [ ! -f "package.json" ]; then
+            echo "::error::❌ No se encontró el archivo package.json."
+            echo "Contenido actual de la raíz:"
+            ls -la
             exit 1
           fi
-          echo "✓ package.json encontrado"
+          echo "✓ package.json encontrado y listo"
 
       - name: 3. Configurar Node.js 20
         uses: actions/setup-node@v4
         with:
           node-version: 20
 
-      - name: 4. Configurar Java JDK 21
+      - name: 4. Configurar Java JDK 21 (Temurin)
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '21'
 
-      - name: 5. Instalar dependencias
+      - name: 5. Instalar dependencias del proyecto
         run: |
           npm install --legacy-peer-deps
 
       - name: 6. Compilar aplicación web
-        run: npm run build
+        run: |
+          npm run build
 
-      - name: 7. Inicializar y sincronizar Capacitor Android
+      - name: 7. Aceptar licencias de Android SDK e instalar plataformas
+        run: |
+          yes | sdkmanager --licenses || true
+          sdkmanager "platforms;android-35" "platforms;android-36" || true
+
+      - name: 8. Sincronizar Capacitor Android
         run: |
           if [ ! -d "android" ]; then
             npx cap add android
           fi
           npx cap sync android
 
-      - name: 8. Compilar APK Android con Gradle
+      - name: 9. Compilar APK Android con Gradle
         run: |
           chmod +x android/gradlew
           cd android
           ./gradlew assembleDebug --no-daemon --stacktrace
 
-      - name: 9. Subir archivo APK
+      - name: 10. Subir archivo APK como artefacto descargable
         uses: actions/upload-artifact@v4
         with:
           name: MiPlata-Android-APK
