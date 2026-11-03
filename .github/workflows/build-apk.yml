@@ -66,13 +66,23 @@ jobs:
           fi
           npx --yes @capacitor/cli sync android
 
-      - name: 9. Compilar APK Android con Gradle
+      - name: 9. Resolver conflicto de clases duplicadas Kotlin
+        run: |
+          cat << 'EOF' >> android/app/build.gradle
+
+          configurations.all {
+              exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib-jdk7'
+              exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib-jdk8'
+          }
+          EOF
+
+      - name: 10. Compilar APK Android con Gradle
         run: |
           chmod +x android/gradlew
           cd android
           ./gradlew assembleDebug --no-daemon --stacktrace
 
-      - name: 10. Subir archivo APK como artefacto descargable
+      - name: 11. Subir archivo APK como artefacto descargable
         uses: actions/upload-artifact@v4
         with:
           name: MiPlata-Android-APK
