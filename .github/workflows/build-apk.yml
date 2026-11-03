@@ -5,7 +5,7 @@ on:
     branches: [ main, master ]
   pull_request:
     branches: [ main, master ]
-  workflow_dispatch: # Permite compilar manualmente con un clic en GitHub
+  workflow_dispatch:
 
 jobs:
   build-android-apk:
@@ -16,41 +16,46 @@ jobs:
       - name: 1. Descargar repositorio
         uses: actions/checkout@v4
 
-      - name: 2. Configurar Node.js 20
+      - name: 2. Verificar archivos del proyecto
+        run: |
+          if [ ! -f "package.json" ]; then
+            echo "::error::❌ ERROR: No se encontró package.json en el repositorio. Debes subir los archivos de la app."
+            exit 1
+          fi
+
+      - name: 3. Configurar Node.js 20
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'npm'
 
-      - name: 3. Configurar Java JDK 17
+      - name: 4. Configurar Java JDK 21 (Requerido por Android Gradle)
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
-          java-version: '17'
+          java-version: '21'
 
-      - name: 4. Configurar Android SDK
+      - name: 5. Configurar Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: 5. Instalar dependencias del proyecto
+      - name: 6. Instalar dependencias del proyecto
         run: |
-          npm install
-          npm install @capacitor/core @capacitor/cli @capacitor/android
+          npm install --legacy-peer-deps
 
-      - name: 6. Compilar aplicación web
+      - name: 7. Compilar aplicación web
         run: npm run build
 
-      - name: 7. Inicializar y sincronizar Capacitor Android
+      - name: 8. Inicializar y sincronizar Capacitor Android
         run: |
-          npx cap add android || true
+          if [ ! -d "android" ]; then
+            npx cap add android
+          fi
           npx cap sync android
 
-      - name: 8. Otorgar permisos de ejecución a Gradle
-        run: chmod +x android/gradlew
-        working-directory: .
-
-      - name: 9. Compilar APK Android (Debug / Release)
-        run: ./gradlew assembleDebug
-        working-directory: android
+      - name: 9. Otorgar permisos y compilar APK Android
+        run: |
+          chmod +x android/gradlew
+          cd android
+          ./gradlew assembleDebug --no-daemon --stacktrace
 
       - name: 10. Subir archivo APK como artefacto descargable
         uses: actions/upload-artifact@v4
