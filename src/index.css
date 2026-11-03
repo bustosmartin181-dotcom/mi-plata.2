@@ -1,0 +1,79 @@
+@import "tailwindcss";
+
+:root {
+  --font-display: 'Fraunces', Georgia, serif;
+  --font-body: 'Outfit', system-ui, -apple-system, sans-serif;
+  --bg: #F5F1EB;
+  --card: #FFFFFF;
+  --tx: #1A1F1C;
+  --mut: #6B756F;
+  --ac: #1B6B4A;
+  --ac-soft: #E6F2EC;
+  --acx: #FFFFFF;
+  --ok: #1B6B4A;
+  --warn: #B86E1E;
+  --bad: #C23B3B;
+  --bd: #E5DFD6;
+}
+
+.dark {
+  --bg: #121614;
+  --card: #1A211D;
+  --tx: #F0F2F0;
+  --mut: #9AA59D;
+  --ac: #3D9B6E;
+  --ac-soft: #1E3328;
+  --acx: #0A120E;
+  --ok: #3D9B6E;
+  --warn: #E09A3E;
+  --bad: #E86A6A;
+  --bd: #2A332E;
+}
+
+body {
+  font-family: var(--font-body);
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.font-display {
+  font-family: var(--font-display);
+}
+
+.font-body {
+  font-family: var(--font-body);
+}
+
+/* Flutter-style smooth tap feedback */
+button:active, .interactive:active {
+  transform: scale(0.975);
+  transition: transform 0.1s ease;
+}
+
+/* Glass navigation bar */
+.nav-glass {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(20px) saturate(1.8);
+  -webkit-backdrop-filter: blur(20px) saturate(1.8);
+}
+
+.dark .nav-glass {
+  background: rgba(26, 33, 29, 0.85);
+  backdrop-filter: blur(20px) saturate(1.8);
+  -webkit-backdrop-filter: blur(20px) saturate(1.8);
+}
+
+/* Custom scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--bd);
+  border-radius: 999px;
+}

@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1B6B4A" />
+      <stop offset="100%" stop-color="#0F422D" />
+    </linearGradient>
+    <linearGradient id="coin" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.95" />
+      <stop offset="100%" stop-color="#E2F0E8" stop-opacity="0.9" />
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="16" stdDeviation="24" flood-color="#000000" flood-opacity="0.25" />
+    </filter>
+  </defs>
+  <rect width="512" height="512" rx="128" fill="url(#bg)" />
+  <g filter="url(#shadow)">
+    <circle cx="256" cy="256" r="170" fill="url(#coin)" />
+    <circle cx="256" cy="256" r="148" fill="none" stroke="#1B6B4A" stroke-width="6" stroke-dasharray="14 10" opacity="0.4" />
+    <!-- Peso / Dollar Symbol styled with Fraunces serif feel -->
+    <path d="M256 140 V372 M210 190 C210 160 230 145 256 145 C295 145 315 170 315 200 C315 235 285 245 256 256 C220 268 195 280 195 315 C195 350 220 370 256 370 C290 370 318 350 322 320" 
+          fill="none" stroke="#1B6B4A" stroke-width="26" stroke-linecap="round" stroke-linejoin="round" />
+  </g>
+</svg>

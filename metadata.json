@@ -1,0 +1,6 @@
+{
+  "name": "Mi Plata - Finanzas Personales",
+  "description": "App multiplataforma de finanzas personales, presupuesto diario inteligente, cuotas, metas, fondo de ahorro, integración directa con Mercado Pago y sincronización en tiempo real.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

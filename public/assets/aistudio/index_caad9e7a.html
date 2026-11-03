@@ -1,0 +1,2971 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mi plata</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700;9..144,800&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+<meta name="theme-color" content="#1B6B4A">
+<style>
+:root {
+  --bg: #F5F1EB;
+  --bg-soft: #EDE8E0;
+  --card: #FFFFFF;
+  --tx: #1A1F1C;
+  --mut: #6B756F;
+  --ac: #1B6B4A;
+  --ac-soft: #E6F2EC;
+  --acx: #FFFFFF;
+  --ok: #1B6B4A;
+  --warn: #B86E1E;
+  --bad: #C23B3B;
+  --bd: #E5DFD6;
+  --shadow: 0 4px 24px rgba(26, 31, 28, 0.06), 0 1px 3px rgba(26, 31, 28, 0.04);
+  --radius: 18px;
+  --radius-sm: 12px;
+  --font-display: 'Fraunces', Georgia, serif;
+  --font-body: 'Outfit', system-ui, sans-serif;
+  box-sizing: border-box;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #121614;
+    --bg-soft: #1C221F;
+    --card: #1A211D;
+    --tx: #F0F2F0;
+    --mut: #9AA59D;
+    --ac: #3D9B6E;
+    --ac-soft: #1E3328;
+    --acx: #0A120E;
+    --ok: #3D9B6E;
+    --warn: #E09A3E;
+    --bad: #E86A6A;
+    --bd: #2A332E;
+    --shadow: 0 4px 24px rgba(0,0,0,0.25);
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #121614;
+  --bg-soft: #1C221F;
+  --card: #1A211D;
+  --tx: #F0F2F0;
+  --mut: #9AA59D;
+  --ac: #3D9B6E;
+  --ac-soft: #1E3328;
+  --acx: #0A120E;
+  --ok: #3D9B6E;
+  --warn: #E09A3E;
+  --bad: #E86A6A;
+  --bd: #2A332E;
+  --shadow: 0 4px 24px rgba(0,0,0,0.25);
+}
+:root[data-theme="light"] {
+  --bg: #F5F1EB;
+  --bg-soft: #EDE8E0;
+  --card: #FFFFFF;
+  --tx: #1A1F1C;
+  --mut: #6B756F;
+  --ac: #1B6B4A;
+  --ac-soft: #E6F2EC;
+  --acx: #FFFFFF;
+  --ok: #1B6B4A;
+  --warn: #B86E1E;
+  --bad: #C23B3B;
+  --bd: #E5DFD6;
+  --shadow: 0 4px 24px rgba(26, 31, 28, 0.06), 0 1px 3px rgba(26, 31, 28, 0.04);
+}
+html { scroll-padding-top: env(safe-area-inset-top, 0px); scroll-behavior: smooth; }
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  min-height: 100dvh;
+  background: var(--bg);
+  color: var(--tx);
+  font: 16px/1.5 var(--font-body);
+  -webkit-font-smoothing: antialiased;
+}
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 80% 50% at 10% -10%, rgba(27, 107, 74, 0.07), transparent),
+    radial-gradient(ellipse 60% 40% at 100% 0%, rgba(184, 110, 30, 0.05), transparent);
+  pointer-events: none;
+  z-index: 0;
+}
+main {
+  position: relative;
+  z-index: 1;
+  max-width: 440px;
+  margin: 0 auto;
+  padding: 20px 20px 100px;
+}
+.card {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 18px;
+  margin-bottom: 14px;
+  box-shadow: var(--shadow);
+  border: 1px solid rgba(229, 223, 214, 0.6);
+}
+.mut { color: var(--mut); font-size: 0.9375rem; }
+.num {
+  font-family: var(--font-display);
+  font-size: 3rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: var(--ok);
+  line-height: 1.05;
+  margin: 6px 0 10px;
+}
+.num.neg { color: var(--bad); }
+.num-ok { color: var(--ok); }
+.num.warn { color: var(--warn); }
+.neg { color: var(--bad); }
+.warn { color: var(--warn); }
+.toast {
+  position: fixed;
+  left: 14px; right: 14px;
+  bottom: calc(70px + env(safe-area-inset-bottom, 0px));
+  background: var(--tx);
+  color: var(--bg);
+  padding: 12px 14px;
+  border-radius: 12px;
+  font-weight: 600;
+  z-index: 30;
+}
+.row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--bd);
+}
+.row:last-child { border-bottom: 0; }
+.row b { font-weight: 600; }
+input, select {
+  font-family: var(--font-body);
+  font-size: 1rem;
+  color: var(--tx);
+  background: var(--bg);
+  border: 1.5px solid var(--bd);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  min-width: 0;
+  width: 100%;
+  outline: none;
+  transition: border-color 0.15s;
+}
+input:focus, select:focus { border-color: var(--ac); }
+input[type=checkbox] { width: 22px; height: 22px; flex: none; }
+textarea {
+  font-family: var(--font-body);
+  width: 100%;
+  box-sizing: border-box;
+  color: var(--tx);
+  background: var(--bg);
+  border: 1.5px solid var(--bd);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  margin-top: 8px;
+}
+button {
+  font-family: var(--font-body);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  border: 0;
+  border-radius: 999px;
+  padding: 13px 22px;
+  background: var(--ac);
+  color: var(--acx);
+  cursor: pointer;
+  transition: transform 0.15s ease, background 0.15s;
+}
+button:active { transform: scale(0.97); }
+button.plegar { display: block; width: 100%; text-align: left; background: none; border: 0; box-shadow: none; padding: 2px 0; color: var(--tx, inherit); font: inherit; font-weight: 700; font-size: 1.05rem; }
+.plegado { margin-top: 12px; }
+button.sec {
+  background: transparent;
+  color: var(--ac);
+  border: 1.5px solid var(--bd);
+}
+button.sec:hover { background: var(--ac-soft); border-color: var(--ac); }
+button.x, button.ghost {
+  background: transparent;
+  color: var(--mut);
+  padding: 8px 12px;
+  border-radius: 8px;
+}
+.bt {
+  display: inline-flex;
+  align-items: center;
+  border: 1.5px solid var(--bd);
+  border-radius: 999px;
+  padding: 11px 16px;
+  color: var(--ac);
+  font-weight: 600;
+  text-decoration: none;
+  background: transparent;
+}
+.bt.wa { color: #25D366; border-color: #25D366; }
+.f { display: flex; gap: 8px; margin-bottom: 10px; align-items: center; }
+h2 { font-size: 1.05rem; margin: 0 0 10px; font-weight: 700; }
+label { display: block; font-size: 0.8125rem; font-weight: 500; color: var(--mut); margin: 10px 0 4px; letter-spacing: 0.01em; }
+nav {
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  display: flex;
+  background: var(--card);
+  border-top: 1px solid var(--bd);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  z-index: 10;
+  max-width: 440px;
+  margin: 0 auto;
+}
+nav button {
+  flex: 1;
+  background: transparent;
+  color: var(--mut);
+  border-radius: 0;
+  padding: 12px 4px 10px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+nav button.on { color: var(--ac); }
+.tb {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr 1fr 1fr;
+  gap: 4px;
+  padding: 7px 4px;
+  border-bottom: 1px solid var(--bd);
+  font-size: 14px;
+}
+.tb[data-d] { cursor: pointer; }
+.td { background: var(--bg); font-weight: 700; }
+.bar {
+  height: 10px;
+  border-radius: 99px;
+  background: var(--bd);
+  overflow: hidden;
+  margin: 12px 0 8px;
+}
+.bar i {
+  display: block;
+  height: 100%;
+  background: var(--ok);
+  border-radius: 99px;
+  transition: width 0.5s ease;
+}
+.bar.warn i { background: var(--warn); }
+.bar.neg i { background: var(--bad); }
+body.pv #m, body.pv nav { filter: blur(16px); }
+.pie {
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 20px calc(14px + env(safe-area-inset-bottom, 0));
+  background: rgba(245, 241, 235, 0.92);
+  backdrop-filter: blur(12px);
+  border-top: 1px solid var(--bd);
+  z-index: 10;
+  max-width: 440px;
+  margin: 0 auto;
+}
+:root[data-theme="dark"] .pie { background: rgba(18, 22, 20, 0.92); }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .pie { background: rgba(18, 22, 20, 0.92); }
+}
+.pie button { min-width: 120px; }
+.serif, .display {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+}
+.hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 32px 8px 24px;
+  min-height: 58vh;
+  justify-content: center;
+}
+.hero .moneda, .hero-icon {
+  width: 88px;
+  height: 88px;
+  border-radius: 28px;
+  background: linear-gradient(145deg, #E6F2EC 0%, #D4EBE0 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 42px;
+  margin-bottom: 28px;
+  box-shadow: 0 8px 32px rgba(27, 107, 74, 0.12);
+}
+.hero-t {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 7vw, 2.6rem);
+  font-weight: 800;
+  margin: 0 0 6px;
+  letter-spacing: -0.03em;
+}
+.hero-s {
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  font-weight: 600;
+  color: var(--ac);
+  margin: 0 0 16px;
+}
+.hero-p {
+  color: var(--mut);
+  font-size: 1.05rem;
+  max-width: 280px;
+  margin: 0 0 28px;
+}
+.paso {
+  flex: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--ac);
+  color: white;
+  font-weight: 700;
+  font-size: 0.875rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.resultado {
+  margin-top: 12px;
+  font-family: var(--font-display);
+  font-size: 2.75rem;
+  font-weight: 800;
+  color: var(--ok);
+  text-align: center;
+  line-height: 1;
+  letter-spacing: -0.03em;
+}
+.resultado span {
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--mut);
+  display: block;
+  margin-top: 4px;
+}
+.grande {
+  font-family: var(--font-display);
+  font-size: 3.2rem;
+  font-weight: 800;
+  color: var(--ok);
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+}
+.chip {
+  border-radius: 999px;
+  padding: 8px 14px;
+  font-size: 0.8125rem;
+  background: var(--bg-soft);
+  color: var(--tx);
+  border: 1px solid transparent;
+  font-weight: 600;
+}
+.chip.on {
+  background: var(--ac);
+  color: var(--acx);
+}
+.copyright {
+  text-align: center;
+  font-size: 12px;
+  color: var(--mut);
+  margin: 18px 0 8px;
+  opacity: 0.85;
+  letter-spacing: 0.01em;
+}
+.copyright::before {
+  content: '';
+}
+.importar { width: 100%; max-width: 340px; margin-top: 18px; padding: 14px; border-radius: var(--radius); background: var(--ac-soft); border: 1.5px dashed var(--ac); text-align: left; }
+.importar-fila { display: flex; align-items: center; gap: 12px; }
+.importar-icono { flex: none; width: 42px; height: 42px; border-radius: 12px; background: var(--card); display: flex; align-items: center; justify-content: center; font-size: 20px; }
+.importar-txt { display: flex; flex-direction: column; font-size: .92rem; line-height: 1.3; }
+.importar-txt span { color: var(--mut); }
+.progreso { display: flex; align-items: center; justify-content: space-between; margin: 4px 2px 14px; }
+.puntos { display: flex; gap: 6px; }
+.puntos span { width: 26px; height: 6px; border-radius: 999px; background: var(--bd); }
+.puntos .hecho { background: var(--ac); opacity: .5; }
+.puntos .actual { background: var(--ac); }
+
+/* ===== Barra flotante de vidrio y botón "＋" (inspirado en el estilo de One UI 8.5) ===== */
+:root { --glass: rgba(255, 255, 255, 0.74); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --glass: rgba(26, 33, 29, 0.74); } }
+:root[data-theme="dark"] { --glass: rgba(26, 33, 29, 0.74); }
+:root[data-theme="light"] { --glass: rgba(255, 255, 255, 0.74); }
+nav {
+  left: 12px; right: 12px; margin: 0 auto;
+  bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+  max-width: 416px;
+  padding: 6px; gap: 2px;
+  border: 1px solid rgba(229, 223, 214, 0.7);
+  border-radius: 32px;
+  background: var(--glass);
+  -webkit-backdrop-filter: blur(18px) saturate(1.4);
+  backdrop-filter: blur(18px) saturate(1.4);
+  box-shadow: 0 10px 30px rgba(26, 31, 28, 0.16);
+}
+nav button { border-radius: 26px; padding: 10px 2px 8px; }
+nav button.on { background: var(--ac-soft); color: var(--ac); }
+.fab {
+  position: fixed; right: 18px; bottom: calc(92px + env(safe-area-inset-bottom, 0px));
+  width: 58px; height: 58px; padding: 0; border: 0; border-radius: 50%;
+  background: var(--ac); color: var(--acx);
+  font-size: 32px; line-height: 1; font-weight: 400;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.24);
+  z-index: 11;
+}
+main { padding-bottom: 150px; }
+.toast { bottom: calc(104px + env(safe-area-inset-bottom, 0px)); }
+body::after {
+  content: ''; position: fixed; left: 0; right: 0; bottom: 0; height: 120px;
+  background: linear-gradient(to top, var(--bg) 25%, transparent);
+  pointer-events: none; z-index: 5;
+}
+body.sin-degradado::after { display: none; }
+body.teclado nav, body.teclado .fab, body.teclado::after { display: none; }
+#demo-capa { position: fixed; inset: 0; z-index: 9998; background: transparent; }
+#demo-frase { position: fixed; left: 12px; right: 12px; top: calc(12px + env(safe-area-inset-top, 0px)); z-index: 9999; padding: 12px 16px; border-radius: 14px; background: rgba(0,0,0,.82); color: #fff; font-size: 20px; font-weight: 700; text-align: center; opacity: 0; transition: opacity .35s; pointer-events: none; }
+#demo-frase.on { opacity: 1; }
+#demo-cuenta { position: fixed; inset: 0; z-index: 10000; background: rgba(0,0,0,.88); color: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; text-align: center; padding: 24px; pointer-events: none; }
+#demo-cuenta .demo-num { font-size: 96px; font-weight: 800; line-height: 1; }
+#demo-cuenta .demo-aviso { font-size: 20px; font-weight: 700; }
+.demo-toque { position: fixed; z-index: 9999; width: 56px; height: 56px; margin: -28px 0 0 -28px; border-radius: 50%; border: 3px solid #fff; background: rgba(255,255,255,.35); box-shadow: 0 0 0 2px rgba(0,0,0,.25); pointer-events: none; animation: demoToque .7s ease-out forwards; }
+#demo-cursor { position: fixed; z-index: 9999; width: 2px; margin-left: 1px; border-radius: 1px; pointer-events: none; animation: demoParpadeo 1s steps(1) infinite; }
+#linea-manana.demo-resalte { background: var(--ac-soft); outline: 3px solid var(--ac); outline-offset: 4px; border-radius: 10px; font-size: 1.25em; transition: all .3s; }
+@keyframes demoParpadeo { 0%, 49% { opacity: 1; } 50%, 100% { opacity: 0; } }
+@keyframes demoToque { from { transform: scale(.4); opacity: 1; } to { transform: scale(1.3); opacity: 0; } }
+
+/* ---- Diseño v9.9.14: más redondeado, anillo de progreso, iconos de color y gráficos ---- */
+:root { --radius: 22px; }
+.card { border-color: var(--bd); }
+.hero-fila { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 6px 0 8px; }
+.hero-card .bar { display: none; }
+.anillo { flex: none; position: relative; width: 92px; height: 92px; }
+.anillo svg { width: 92px; height: 92px; transform: rotate(-90deg); }
+.anillo b { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 0.95rem; }
+.kchip { display: inline-flex; flex: none; width: 34px; height: 34px; border-radius: 12px; align-items: center; justify-content: center; margin-right: 10px; font-style: normal; font-size: 1.1rem; background: color-mix(in srgb, var(--kc) 20%, transparent); }
+.k0 { --kc: #E8833A; } .k1 { --kc: #3B82C4; } .k2 { --kc: #3D9B6E; } .k3 { --kc: #B35BC4; } .k4 { --kc: #D9534F; } .k5 { --kc: #7C8A82; }
+.grafico { width: 100%; height: auto; display: block; }
+.fab { width: 64px; height: 64px; font-size: 2rem; box-shadow: 0 8px 24px rgba(0,0,0,0.28); }
+</style></head><body>
+<main id="m"></main>
+<nav><button data-t="plan">Plan</button><button data-t="hoy">Hoy</button><button data-t="dias">Días</button><button data-t="ajustes">Ajustes</button></nav>
+<button id="fab" class="fab" aria-label="Anotar gasto" style="display:none">＋</button>
+<script>
+const CONFIG = {"nube": false, "claude": false, "sw": false, "apk": true};
+/* =====================================================================
+   01 · UTILIDADES — formatos, fechas y texto. No dependen de la pantalla.
+   ===================================================================== */
+const MS_DIA = 864e5;
+const NOMBRES_DIA = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
+
+const dosDigitos = n => String(n).padStart(2, '0');
+const suma = (lista, valor) => lista.reduce((total, x) => total + valor(x), 0);
+
+/* Dinero */
+const pesos = n =>
+  (Math.round(n) < 0 ? '-' : '') + '$' + Math.abs(Math.round(n)).toLocaleString('es-AR');
+const pesosConCentavos = n =>
+  (n < 0 ? '-' : '') + '$' +
+  Math.abs(n).toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const redondear2 = n => Math.round(n * 100) / 100;
+
+/* Lee un monto escrito a mano: "3.500,50" -> 3500.5 */
+const aNumero = v =>
+  +String(v).replace(/\./g, '').replace(',', '.').replace(/[^\d.-]/g, '') || 0;
+
+/* Texto seguro para insertar en HTML */
+const escapar = s => String(s).replace(/[&<>"]/g, c =>
+  ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+/* Fechas: se manejan como texto "AAAA-MM-DD" y como número de día (sin horas) */
+function numeroDeDia(iso) {
+  const [a, m, d] = iso.split('-').map(Number);
+  return Date.UTC(a, m - 1, d) / MS_DIA;
+}
+const isoDeNumero = n => new Date(n * MS_DIA).toISOString().slice(0, 10);
+/* Mercado Pago acredita el rendimiento por la mañana de cada día hábil (lunes a viernes); lo de fin de semana llega junto el lunes. No contempla feriados. */
+const esHabil = n => { const d = new Date(n * MS_DIA).getUTCDay(); return d >= 1 && d <= 5; };
+function hoyISO() {
+  const d = new Date();
+  return d.getFullYear() + '-' + dosDigitos(d.getMonth() + 1) + '-' + dosDigitos(d.getDate());
+}
+function mesSiguiente(iso) {
+  const [a, m, d] = iso.split('-').map(Number);
+  return new Date(Date.UTC(a, m, d)).toISOString().slice(0, 10);
+}
+const diaYMes = iso => iso.slice(8) + '/' + iso.slice(5, 7);
+const mananaISO = hoy => isoDeNumero(numeroDeDia(hoy) + 1);
+
+/* =====================================================================
+   02 · NÚCLEO — las reglas del dinero. Funciones puras: reciben el estado
+   y la fecha de hoy, y devuelven números. No tocan la pantalla.
+   Esto es lo que verifican los tests.
+   ===================================================================== */
+
+const montoDe = item => +item.a || 0;
+
+/* Estado vacío para empezar de cero */
+function estadoInicial(hoy) {
+  return {
+    sueldo: 0, previo: 0, bienvenida: false, ingresos: [{ cat: 'Sueldo', a: 0 }],
+    start: hoy, end: mesSiguiente(hoy),
+    items: [{ n: '', a: 0, p: false }, { n: '', a: 0, p: false }, { n: '', a: 0, p: false }],
+    spent: [], recal: null,
+  };
+}
+
+/* Modo demo: datos de ejemplo para grabar videos o sacar capturas sin mostrar la plata real.
+   Los datos reales se guardan aparte (CLAVE_REAL) y vuelven al salir del modo demo. */
+function estadoDemo(real) {
+  const hoy = hoyISO(), n = numeroDeDia(hoy), start = isoDeNumero(n - 11);
+  const D = {
+    demo: true, bienvenida: true, nombre: 'Martín',
+    sueldo: 620000, previo: 0, ingresos: [{ cat: 'Sueldo', a: 620000 }],
+    start, end: mesSiguiente(start),
+    items: [
+      { n: 'Alquiler', a: 180000, p: true }, { n: 'Luz', a: 25000, p: true }, { n: 'Internet', a: 20000, p: true },
+    ],
+    spent: [], recal: null,
+    metas: [{ id: 1, n: 'Vacaciones', t: 300000, g0: 60000, f: '' }],
+    ultimaCopia: Date.now(),
+  };
+  ['tema', 'color', 'pin', 'salt', 'pinApp'].forEach(k => { if (real[k] !== undefined) D[k] = real[k]; });
+  const gastos = [
+    [-11, 12500, 'Supermercado', 'Súper'], [-10, 13500, 'Cena con amigos', 'Salidas'],
+    [-9, 2500, 'SUBE', 'Transporte'], [-9, 9300, 'Almuerzo', 'Comida'],
+    [-8, 15200, 'Supermercado', 'Súper'], [-7, 8400, 'Delivery', 'Comida'], [-7, 3100, 'Kiosco', 'Otro'],
+    [-6, 7100, 'Farmacia', 'Salud'], [-6, 6000, 'Nafta', 'Transporte'],
+    [-5, 8800, 'Almuerzo', 'Comida'], [-5, 2900, 'Café', 'Comida'],
+    [-4, 14400, 'Supermercado', 'Súper'], [-3, 3000, 'SUBE', 'Transporte'], [-3, 8900, 'Panadería y almuerzo', 'Comida'],
+    [-2, 11200, 'Cine', 'Salidas'], [-1, 9400, 'Almuerzo y café', 'Comida'],
+  ];
+  gastos.forEach(([d, amt, note, cat], i) => D.spent.push({ id: Date.now() + i, date: isoDeNumero(n + d), amt, note, cat }));
+  return D;
+}
+
+/* Reparte el saldo entre las cuentas de ejemplo para que coincidan con lo que dice la app */
+function ajustarCuentasDemo() {
+  const saldo = Math.round(calcular(S, hoyISO()).saldo), banco = Math.round(saldo * 0.6), mp = Math.round(saldo * 0.3);
+  S.cuentas = [{ n: 'Banco', m: banco }, { n: 'Mercado Pago', m: mp }, { n: 'Efectivo', m: saldo - banco - mp }];
+}
+
+/* Todos los números del período para el día `hoy`.
+   - Un gasto importante con fecha `d` y las recomposiciones se descuentan
+     desde su fecha, repartidos entre los días que faltan.
+   - Lo que se aparta para una meta (gasto con `meta`) sale de la plata
+     disponible, no del presupuesto de un día. */
+function calcular(S, hoy) {
+  const total        = suma(S.items, montoDe);
+  /* Un aumento de monto en un gasto ya cargado (i.x = [{ amt, desde }]) se descuenta
+     desde su fecha, no desde el primer día del período. */
+  const aumentosDe   = i => i.x || [];
+  const montoBase    = i => montoDe(i) - suma(aumentosDe(i), x => +x.amt || 0);
+  const totalBase    = suma(S.items.filter(i => !i.d), montoBase);
+  const porPagar     = suma(S.items.filter(i => !i.p), montoDe);
+  const descuentos   = (S.ajustes || []).concat(
+    S.items.filter(i => i.d).map(i => ({ amt: -montoBase(i), desde: i.d })),
+    S.items.reduce((l, i) => l.concat(aumentosDe(i).map(x => ({ amt: -(+x.amt || 0), desde: x.desde }))), []));
+  const aportes      = suma(S.spent.filter(e => e.meta), e => e.amt);
+  const dispBase     = (+S.sueldo || 0) + (+S.previo || 0) - totalBase - aportes;
+  let disp           = dispBase + suma(descuentos, x => x.amt);
+
+  const dias    = Math.max(1, numeroDeDia(S.end) - numeroDeDia(S.start));
+  const hoyIdx  = Math.min(Math.max(numeroDeDia(hoy) - numeroDeDia(S.start), 0), dias - 1);
+  const base    = dispBase / dias;
+  const recal   = (S.recal && S.recal.day <= hoyIdx) ? S.recal : null;
+  const desde   = recal ? recal.day : 0;
+
+  /* descuento diario (negativo) que corresponde al día i */
+  const extra = i => suma(descuentos, x => {
+    const d0 = x.desde ? Math.max(0, numeroDeDia(x.desde) - numeroDeDia(S.start)) : 0;
+    return i >= d0 ? x.amt / Math.max(1, dias - d0) : 0;
+  });
+  const presupuestoDia = i => (recal && i >= recal.day) ? recal.base : base + extra(i);
+
+  const idxDe     = e => numeroDeDia(e.date) - numeroDeDia(S.start);
+  const gastado   = (a, b) =>
+    suma(S.spent.filter(e => !e.meta && idxDe(e) >= a && idxDe(e) <= b), e => e.amt);
+  const gastoHoy  = gastado(hoyIdx, hoyIdx);
+
+  /* Rendimiento estimado del dinero disponible (Mercado Pago): cada día cerrado rinde (tasa anual / 365) sobre lo que
+     tenías disponible al empezar ese día. Se suma al disponible como una recomposición a favor y se reparte entre los
+     días que faltan (desde el día siguiente). Es una estimación sobre el número de la app. */
+  const tasaD = Math.min(300, Math.max(0, +S.rendTasa || 0));
+  const rendDispActivo = !!S.rendDispOn && tasaD > 0 && !!S.rendDispDesde;
+  const rD = tasaD / 100 / 365;
+  const kD0 = rendDispActivo ? Math.max(0, numeroDeDia(S.rendDispDesde) - numeroDeDia(S.start)) : 0;
+  let rendDisp = 0, pendD = 0;
+  const sumarRendDisp = (k, aportesPrevios, usosHasta) => {
+    if (!rendDispActivo || k < kD0) return;
+    const y = Math.max(0, disp - gastado(-1e9, k - 1) - aportesPrevios + usosHasta) * rD;
+    pendD += y;
+    if (esHabil(numeroDeDia(S.start) + k + 1)) {
+      descuentos.push({ amt: pendD, desde: isoDeNumero(numeroDeDia(S.start) + k + 1) });
+      disp += pendD; rendDisp += pendD; pendD = 0;
+    }
+  };
+  if (!S.modoFondo) for (let k = 0; k < hoyIdx; k++) sumarRendDisp(k, 0, 0);
+
+  let acumulado = 0;
+  for (let i = desde; i <= hoyIdx; i++) acumulado += presupuestoDia(i);
+  const quedaHoy = acumulado - gastado(desde, hoyIdx);
+  const hayManana = hoyIdx < dias - 1;
+  let saldoPeriodo   = disp - suma(S.spent.filter(e => !e.meta), e => e.amt);
+
+  /* MODO FONDO: lo que no se gasta de cada día NO pasa al día siguiente: va a un fondo aparte.
+     Cada día arranca con su base. Si te pasás, depende de S.fondoExceso:
+       'siguiente' (por defecto): lo que te pasaste se descuenta del día siguiente.
+       'fondo': lo que te pasaste se descuenta del fondo.
+       'aparte': no se descuenta de ningún lado. */
+  const modoFondo = !!S.modoFondo, regla = S.fondoExceso === 'aparte' ? 'aparte' : 'siguiente';
+  let filas = null, fondo = { activo: false }, quedaHoyF = quedaHoy, mananaF = null;
+  if (modoFondo) {
+    /* El fondo cuenta desde el día en que se activó (S.fondoDesde). Los días anteriores se calculan
+       como siempre (lo que sobra pasa al día siguiente) y no aportan al fondo: así, al activarlo,
+       lo que ya tenés hoy no cambia, y desde esta noche lo que no gastes del día va al fondo. */
+    const iniFondo = S.fondoDesde ? Math.min(Math.max(numeroDeDia(S.fondoDesde) - numeroDeDia(S.start), 0), dias - 1) : 0;
+    /* Retiros del fondo marcados "para gastar" (para:'hoy'): suman al presupuesto del día en que se sacaron.
+       Si ese día no se gastan, al cierre vuelven solos al fondo (porque sobran). */
+    const extraRetiro = {};
+    (S.fondoUsos || []).forEach(x => {
+      if (x.para === 'cubre') return;
+      const k = Math.min(Math.max(numeroDeDia(x.date) - numeroDeDia(S.start), 0), dias - 1);
+      extraRetiro[k] = (extraRetiro[k] || 0) + (+x.amt || 0);
+    });
+    const usosHastaDia = i => suma((S.fondoUsos || []).filter(x => x.para !== 'cubre' &&
+      Math.min(Math.max(numeroDeDia(x.date) - numeroDeDia(S.start), 0), dias - 1) <= i), x => +x.amt || 0);
+    filas = []; let arrastre = 0, aportesAcum = 0;
+    for (let i = 0; i < dias; i++) {
+      if (recal && i === recal.day) arrastre = 0;
+      const sin = presupuestoDia(i) + (extraRetiro[i] || 0);
+      const presupuesto = i <= hoyIdx + 1 ? sin + arrastre : sin;
+      const gasto = gastado(i, i);
+      const sobra = presupuesto - gasto;
+      const previo = i < iniFondo;
+      filas.push({ i, presupuesto, gasto, sobra, aporte: previo ? 0 : (regla === 'fondo' ? sobra : Math.max(0, sobra)) });
+      arrastre = previo ? sobra : (regla === 'siguiente' ? Math.min(0, sobra) : 0);
+      if (i < hoyIdx) sumarRendDisp(i, aportesAcum, usosHastaDia(i));
+      aportesAcum += filas[i].aporte;
+    }
+    saldoPeriodo = disp - suma(S.spent.filter(e => !e.meta), e => e.amt);
+    const cerrados = Math.min(dias, Math.max(0, numeroDeDia(hoy) - numeroDeDia(S.start)));
+    const ahorroPeriodo = suma(filas.slice(0, cerrados), f => f.aporte);
+    const usos = suma(S.fondoUsos || [], x => +x.amt || 0), previo = +S.fondoPrev || 0;
+    const usosParaGastar = suma((S.fondoUsos || []).filter(x => x.para !== 'cubre'), x => +x.amt || 0);
+    /* Rendimiento estimado (Mercado Pago): la tasa anual se pasa a diaria y se suma al cierre de cada día
+       sobre el fondo + lo ya rendido (interés compuesto). Es solo una estimación y no toca tu plata disponible. */
+    const tasaRend = Math.min(300, Math.max(0, +S.rendTasa || 0));
+    const rendActivo = !!S.rendOn && tasaRend > 0 && !!S.rendDesde;
+    const rendPrev = rendActivo ? (+S.rendPrev || 0) : 0;
+    let rendPer = 0, rendPend = 0;
+    if (rendActivo) {
+      const r = tasaRend / 100 / 365;
+      const k0 = Math.max(0, numeroDeDia(S.rendDesde) - numeroDeDia(S.start));
+      const idxUso = x => Math.min(Math.max(numeroDeDia(x.date) - numeroDeDia(S.start), 0), dias - 1);
+      let acum = 0, pend = 0;
+      for (let k = 0; k < cerrados; k++) {
+        if (k > 0) acum += filas[k - 1].aporte;
+        if (k < k0) continue;
+        const usado = suma((S.fondoUsos || []).filter(x => idxUso(x) <= k), x => +x.amt || 0);
+        pend += Math.max(0, previo + acum - usado + rendPrev + rendPer) * r;
+        if (esHabil(numeroDeDia(S.start) + k + 1)) { rendPer += pend; pend = 0; }
+      }
+      rendPend = pend;
+    }
+    quedaHoyF = filas[hoyIdx].presupuesto - filas[hoyIdx].gasto;
+    mananaF = hayManana ? presupuestoDia(hoyIdx + 1) + (regla === 'siguiente' ? Math.min(0, quedaHoyF) : 0) : null;
+    fondo = {
+      activo: true, regla, fondoPrev: previo, ahorroPeriodo, usos,
+      total: previo + ahorroPeriodo - usos,
+      rend: rendPrev + rendPer, rendPend, totalConRend: previo + ahorroPeriodo - usos + rendPrev + rendPer, rendEnMP: !!S.rendEnMP,
+      acumulado: previo + (+S.fondoRetirado || 0) + ahorroPeriodo,     // lo ahorrado en total: nunca baja
+      hoySuma: regla === 'fondo' ? quedaHoyF : Math.max(0, quedaHoyF),
+      disponible: saldoPeriodo - ahorroPeriodo + usosParaGastar,   // lo retirado para gastar pasa a disponible
+    };
+  }
+
+  return {
+    total, porPagar, disp, dias, hoyIdx, base, recal, extra, presupuestoDia, rendDisp,
+    baseHoy: presupuestoDia(hoyIdx),
+    baseManana: hayManana ? presupuestoDia(hoyIdx + 1) : null,
+    manana: modoFondo ? mananaF : (hayManana ? presupuestoDia(hoyIdx + 1) + quedaHoy : null),
+    gastoHoy, quedaHoy: modoFondo ? quedaHoyF : quedaHoy, filas, fondo,
+    faltan: dias - hoyIdx,
+    saldo: disp - suma(S.spent.filter(e => !e.meta), e => e.amt),
+    gastadoAntesDeHoy: gastado(-1e9, hoyIdx - 1),
+  };
+}
+
+/* Tabla día por día: presupuesto (con lo que arrastra), gasto y sobrante */
+function diasDelPeriodo(S, hoy) {
+  const c = calcular(S, hoy), salida = [];
+  if (c.fondo.activo) return c.filas.map(f => {
+    const n = numeroDeDia(S.start) + f.i;
+    return { i: f.i, iso: isoDeNumero(n), dia: NOMBRES_DIA[new Date(n * MS_DIA).getUTCDay()],
+             presupuesto: f.presupuesto, gasto: f.gasto, sobra: f.sobra };
+  });
+  let arrastre = 0;
+  for (let i = 0; i < c.dias; i++) {
+    if (c.recal && i === c.recal.day) arrastre = 0;
+    const sinArrastre = (c.recal && i >= c.recal.day) ? c.recal.base : c.base + c.extra(i);
+    const presupuesto = i <= c.hoyIdx + 1 ? sinArrastre + arrastre : sinArrastre;
+    const n = numeroDeDia(S.start) + i, iso = isoDeNumero(n);
+    const gasto = suma(S.spent.filter(e => e.date === iso && !e.meta), e => e.amt);
+    const sobra = presupuesto - gasto;
+    arrastre = sobra;
+    salida.push({ i, iso, dia: NOMBRES_DIA[new Date(n * MS_DIA).getUTCDay()],
+                  presupuesto, gasto, sobra });
+  }
+  return salida;
+}
+
+/* Semáforo del día: [clase, mensaje] */
+function semaforo(c, S) {
+  const presupuesto = c.quedaHoy + c.gastoHoy, umbral = (S.aviso ?? 20) / 100;
+  if (c.quedaHoy < 0) return ['neg', 'Te pasaste del límite de hoy.'];
+  if (presupuesto > 0 && c.quedaHoy <= presupuesto * umbral)
+    return ['warn', 'Ya vas llegando al límite de hoy.'];
+  return ['', ''];
+}
+
+/* Compara lo que hay en las cuentas con lo que dice la app */
+function conciliar(S, c) {
+  const cuentas = (S.cuentas || []).filter(x => !x.x);
+  const total = suma(cuentas, x => +x.m || 0);
+  const apartadoEnMetas = suma(S.spent.filter(e => e.meta), e => e.amt);
+  return {
+    hayCuentas: cuentas.some(x => (+x.m || 0) > 0),
+    total,
+    diferencia: total - c.saldo - apartadoEnMetas - (c.fondo.activo ? c.fondo.fondoPrev - c.fondo.usos + (c.fondo.rendEnMP ? c.fondo.rend : 0) : 0),
+  };
+}
+
+/* Metas */
+const juntadoEnMeta = (S, m) =>
+  (+m.g0 || 0) + suma(S.spent.filter(e => e.meta === m.id), e => e.amt);
+function aporteMensualSugerido(S, m, hoy) {
+  const falta = Math.max(0, m.t - juntadoEnMeta(S, m));
+  if (!(m.t > 0 && falta > 0 && m.f)) return 0;
+  return Math.round(falta / Math.max(1, (numeroDeDia(m.f) - numeroDeDia(hoy)) / 30.4));
+}
+
+/* Cierre nocturno: congela los días ya cerrados y guarda una copia.
+   Devuelve true si cambió algo (hay que guardar). */
+function congelarDias(S, hoy, incluirHoy) {
+  S.cierres = S.cierres || {};
+  let ultimo = null;
+  diasDelPeriodo(S, hoy).forEach(x => {
+    if (!S.cierres[x.iso] && (x.iso < hoy || (incluirHoy && x.iso === hoy))) {
+      S.cierres[x.iso] = { b: redondear2(x.presupuesto), g: x.gasto, l: redondear2(x.sobra) };
+      ultimo = x.iso;
+    }
+  });
+  if (!ultimo) return false;
+  const { copias, cierres, ...resto } = S;
+  S.copias = (S.copias || []).concat([{ iso: ultimo, json: JSON.stringify(resto) }]).slice(-14);
+  return true;
+}
+const estaCerrado = (S, iso) => !!(S.cierres && S.cierres[iso]);
+
+/* Pasar al período siguiente: guarda el actual en el historial y vuelve a cero.
+   Los ingresos se mantienen; las cuotas avanzan una y las terminadas se sacan.
+   Devuelve los nombres de los gastos que terminaron de pagarse. */
+function iniciarPeriodo(S, hoy, { sueldo, previo, inicio, fin }) {
+  const c = calcular(S, hoy);
+  S.hist = (S.hist || []).concat([{
+    start: S.start, end: S.end, sueldo: S.sueldo, previo: S.previo,
+    importantes: c.total, gastado: suma(S.spent.filter(e => !e.meta), e => e.amt), quedo: c.saldo,
+    ahorro: c.fondo.activo ? redondear2(c.fondo.ahorroPeriodo) : undefined,
+  }]);
+  /* modo fondo: lo ahorrado queda guardado aparte y no entra en el presupuesto del período nuevo */
+  if (c.fondo.activo) { S.fondoPrev = redondear2(c.fondo.total); S.fondoRetirado = redondear2((+S.fondoRetirado || 0) + c.fondo.usos); S.fondoUsos = [];
+    if (S.rendOn) { S.rendPrev = redondear2(c.fondo.rend + (c.fondo.rendPend || 0)); S.rendDesde = inicio; } }
+  const terminadas = avanzarCuotas(S);
+  /* Gastos fijos: los que no tienen el tilde de repetir se sacan (salvo los que están en cuotas);
+     los marcados con "el monto cambia" quedan con el monto vacío. Los gastos de versiones viejas se mantienen. */
+  S.items = S.items.filter(i => tieneCuotas(i) || i.f !== false);
+  S.items.forEach(i => { i.p = false; delete i.d; delete i.x;
+    if (i.prox != null && i.prox !== '') i.a = +i.prox || 0;          // el monto que ya cargaste para el período nuevo
+    else if (i.v && !tieneCuotas(i)) i.a = 0;
+    delete i.prox; });
+  /* Gastos anotados por adelantado: pasan a ser gastos del período nuevo */
+  (S.proximos || []).filter(x => x.n || x.a).forEach(x => S.items.push({ n: x.n || '', a: +x.a || 0, p: false, f: false, v: false }));
+  S.proximos = [];
+  S.fondoDesde = '';
+  if (S.rendDispOn) S.rendDispDesde = inicio;
+  S.cierres = {}; S.ajustes = []; S.spent = []; S.recal = null;
+  if (sueldo !== undefined) { S.sueldo = sueldo; S.ingresos = [{ cat: 'Sueldo', a: sueldo }]; }
+  S.previo = previo; S.start = inicio; S.end = fin;
+  return terminadas;
+}
+
+/* Ingresos: de dónde viene la plata. El total alimenta a S.sueldo, que usa el cálculo. */
+const CATEGORIAS_INGRESO = ['Sueldo', 'Trabajo independiente', 'Efectivo', 'Changas o trabajo extra', 'Alquileres',
+  'Jubilación o pensión', 'Ventas o negocio', 'Ayuda familiar', 'Otros'];
+const totalIngresos = S => suma(S.ingresos || [], i => +i.a || 0);
+
+/* Cuotas: un gasto en cuotas tiene q = { actual: 5, total: 12 }. Sin q, es un pago único. */
+const tieneCuotas = i => !!(i.q && i.q.total > 1);
+const cuotasRestantes = i => tieneCuotas(i) ? Math.max(0, i.q.total - i.q.actual) : 0;
+const resumenCuotas = S => S.items.filter(tieneCuotas).map(i => ({
+  n: i.n, actual: i.q.actual, total: i.q.total, monto: montoDe(i),
+  restantes: cuotasRestantes(i), restoTotal: montoDe(i) * cuotasRestantes(i) }));
+function avanzarCuotas(S) {
+  const terminadas = [];
+  S.items = S.items.filter(i => {
+    if (!tieneCuotas(i)) return true;
+    if (i.q.actual >= i.q.total) { terminadas.push(i.n || 'Gasto en cuotas'); return false; }
+    i.q.actual += 1;
+    return true;
+  });
+  return terminadas;
+}
+
+/* Repara datos de versiones anteriores: crea la lista de ingresos a partir del sueldo
+   y decide si ya se hizo la introducción (quien ya usaba la app no la ve). */
+function migrarEstado(S) {
+  if (!S.ingresos) S.ingresos = [{ cat: 'Sueldo', a: +S.sueldo || 0 }];
+  if (S.bienvenida === undefined) S.bienvenida = (+S.sueldo > 0) || (S.spent || []).length > 0;
+  return S;
+}
+
+/* Copias de seguridad: ¿hay que avisar que hace días que no se guarda una?
+   - S.ultimaCopia: cuándo se guardó la última (milisegundos).
+   - S.diasCopia: cada cuántos días recordar (7 por defecto, 0 = nunca).
+   - S.posponerCopia: hasta cuándo no molestar después de tocar "Más tarde".
+   Si nunca se guardó una, se avisa recién cuando ya hay algunos gastos anotados. */
+function estadoCopia(S, ahora) {
+  const cada = S.diasCopia === undefined ? 7 : S.diasCopia;
+  const dias = S.ultimaCopia ? Math.max(0, Math.floor((ahora - S.ultimaCopia) / MS_DIA)) : null;
+  const pospuesto = !!S.posponerCopia && ahora < S.posponerCopia;
+  let avisar = false;
+  if (cada > 0 && !pospuesto) avisar = dias === null ? (S.spent || []).length >= 3 : dias >= cada;
+  return { dias, avisar, cada };
+}
+
+/* Racha en verde: días seguidos (hasta ayer) sin pasarse del presupuesto.
+   `ultimos` son los últimos 7 días cerrados, del más viejo al más nuevo (true = en verde). */
+function rachaEnVerde(S, hoy) {
+  const dias = diasDelPeriodo(S, hoy), hoyIdx = calcular(S, hoy).hoyIdx;
+  let racha = 0;
+  for (let i = hoyIdx - 1; i >= 0 && dias[i].sobra >= 0; i--) racha++;
+  const ultimos = [];
+  for (let i = Math.max(0, hoyIdx - 7); i < hoyIdx; i++) ultimos.push(dias[i].sobra >= 0);
+  return { racha, ultimos };
+}
+
+/* Objetivo diario: cuánto querés gastar por día y cuánto te sobra si lo cumplís.
+   - disponibleHoy: la plata que tenías al empezar hoy (saldo + lo gastado hoy).
+   - promedio: lo máximo que podrías gastar por día, parejo, hasta el fin del período.
+   - proyectado: lo que te sobra al final si gastás justo el objetivo desde hoy. */
+function objetivoDiario(S, hoy) {
+  const obj = +S.objetivo || 0;
+  if (!(obj > 0)) return null;
+  const c = calcular(S, hoy), dias = diasDelPeriodo(S, hoy);
+  const disponibleHoy = c.saldo + c.gastoHoy;
+  const proyectadoCon = o => disponibleHoy - o * c.faltan;
+  /* "Ahorrado" cuenta solo desde el día en que se puso el objetivo (S.objetivoDesde); si no hay fecha, desde hoy */
+  const desdeIdx = S.objetivoDesde ? Math.min(c.hoyIdx, Math.max(0, numeroDeDia(S.objetivoDesde) - numeroDeDia(S.start))) : c.hoyIdx;
+  let ahorradoAntes = 0;
+  for (let i = desdeIdx; i < c.hoyIdx; i++) ahorradoAntes += obj - dias[i].gasto;
+  const paso = Math.max(500, Math.round(obj * 0.1 / 500) * 500);
+  const escenarios = [-2, -1, 0, 1].map(k => obj + k * paso).filter(o => o > 0)
+    .map(o => ({ o, sobra: proyectadoCon(o), actual: o === obj }));
+  return {
+    obj, faltan: c.faltan, gastoHoy: c.gastoHoy, disponibleHoy,
+    promedio: disponibleHoy / c.faltan,
+    proyectado: proyectadoCon(obj),
+    ahorroHoy: obj - c.gastoHoy,
+    ahorradoAntes, diasPrevios: c.hoyIdx - desdeIdx, escenarios,
+  };
+}
+
+/* Categorías rápidas para anotar un gasto en dos toques */
+const CATEGORIAS_GASTO = [['🍔', 'Comida'], ['🚌', 'Transporte'], ['🛒', 'Súper'], ['🎉', 'Salidas'], ['💊', 'Salud'], ['✨', 'Otro']];
+const emojiCategoria = cat => { const c = CATEGORIAS_GASTO.find(x => x[1] === cat); return c ? c[0] + ' ' : ''; };
+
+/* Textos del día */
+const FRASES = ['Cada peso anotado es un peso que controlás.','Gastar con intención rinde más que gastar con culpa.','Hoy un pequeño ahorro, mañana una gran tranquilidad.','Lo que no se anota se escapa.','Pagá primero lo importante y vivé con lo que sobra.','Un día en verde es un buen día.','No es cuánto ganás, es cuánto te queda.','Ahorrar no es privarse, es elegir.','Pasito a pasito se junta la meta.','Revisar tus números es cuidarte.','La constancia le gana a la urgencia.','Una meta clara se junta más rápido.','Antes de comprar, esperá un día.','Tu yo del mes que viene te lo va a agradecer.','Lo barato sale caro si no lo necesitás.','Un imprevisto no arruina el mes, se reparte.','Anotar toma diez segundos, ordenarse rinde todo el mes.','Cuidá los pesos chicos, son los que más se escapan.','Cada ahorro suma, aunque sea chico.','Planificar es tener tranquilidad.','Gastá en lo que te acerca a tus metas.','El orden es la mitad del ahorro.','Hoy es un buen día para anotar todo.','La plata ordenada alcanza para más.','Poco por día, mucho al final.','Pensá en tu meta cada vez que dudes.','Lo que juntás hoy es libertad mañana.','Un presupuesto es una guía, no una cárcel.','Respirá antes de comprar.','Seguí así, vas mejor de lo que creés.'];
+const fraseDelDia = hoy => FRASES[numeroDeDia(hoy) % FRASES.length];
+const saludoSegunHora = h => h < 12 ? 'Buen día' : h < 20 ? 'Buenas tardes' : 'Buenas noches';
+function fraseDeEstado(c, clase) {
+  if (c.quedaHoy < 0) return 'Mañana lo acomodamos con lo que queda.';
+  if (clase === 'warn') return 'Cuidado con lo que queda del día.';
+  if (c.gastoHoy === 0) return 'Todavía no gastaste nada hoy.';
+  return 'Venís bien, seguí así.';
+}
+
+/* =====================================================================
+   02b · EXPORTAR — Excel (.xlsx) y PDF armados a mano, sin librerías
+   (la app tiene que funcionar sin internet). Funciones puras.
+   ===================================================================== */
+const VERSION_APP = '9.9.27';
+const aBytes = txt => new TextEncoder().encode(txt);
+const aBase64 = bytes => {
+  let b = '';
+  for (let i = 0; i < bytes.length; i += 0x8000) b += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000));
+  return btoa(b);
+};
+const TABLA_CRC = (() => {
+  const t = new Uint32Array(256);
+  for (let n = 0; n < 256; n++) { let c = n; for (let k = 0; k < 8; k++) c = c & 1 ? 0xEDB88320 ^ (c >>> 1) : c >>> 1; t[n] = c >>> 0; }
+  return t;
+})();
+function crc32(b) { let c = 0xFFFFFFFF; for (let i = 0; i < b.length; i++) c = TABLA_CRC[(c ^ b[i]) & 255] ^ (c >>> 8); return (c ^ 0xFFFFFFFF) >>> 0; }
+function juntarBytes(lista) {
+  const total = lista.reduce((t, x) => t + x.length, 0), salida = new Uint8Array(total);
+  let pos = 0; lista.forEach(x => { salida.set(x, pos); pos += x.length; });
+  return salida;
+}
+
+/* .zip sin comprimir (alcanza para armar un .xlsx). archivos = [{ n: nombre, d: Uint8Array }] */
+function crearZip(archivos) {
+  const u16 = n => [n & 255, (n >> 8) & 255];
+  const u32 = n => [n & 255, (n >>> 8) & 255, (n >>> 16) & 255, (n >>> 24) & 255];
+  const locales = [], centrales = []; let pos = 0;
+  archivos.forEach(a => {
+    const nombre = aBytes(a.n), crc = crc32(a.d), tam = a.d.length;
+    const local = Uint8Array.from([].concat(u32(0x04034b50), u16(20), u16(0x0800), u16(0), u16(0), u16(0x21),
+      u32(crc), u32(tam), u32(tam), u16(nombre.length), u16(0)));
+    locales.push(local, nombre, a.d);
+    centrales.push(Uint8Array.from([].concat(u32(0x02014b50), u16(20), u16(20), u16(0x0800), u16(0), u16(0), u16(0x21),
+      u32(crc), u32(tam), u32(tam), u16(nombre.length), u16(0), u16(0), u16(0), u16(0), u32(0), u32(pos))), nombre);
+    pos += local.length + nombre.length + tam;
+  });
+  const central = juntarBytes(centrales);
+  const fin = Uint8Array.from([].concat(u32(0x06054b50), u16(0), u16(0), u16(archivos.length), u16(archivos.length),
+    u32(central.length), u32(pos), u16(0)));
+  return juntarBytes(locales.concat([central, fin]));
+}
+
+/* Datos que se exportan (los usan el Excel y el PDF) */
+function datosExportar(S, hoy) {
+  const c = calcular(S, hoy), dias = diasDelPeriodo(S, hoy), o = objetivoDiario(S, hoy);
+  const fecha = iso => diaYMes(iso) + '/' + iso.slice(0, 4);
+  const resumen = [
+    ['Período', fecha(S.start) + ' al ' + fecha(S.end)],
+    ['Total de ingresos', totalIngresos(S), true],
+    ['Total gastos importantes', c.total, true],
+    ['Todavía por pagar', c.porPagar, true],
+    ['Disponible del mes', c.disp, true],
+    ['Base por día', c.base, true],
+    ['Gastado en el período', suma(S.spent.filter(e => !e.meta), e => e.amt), true],
+    ['Saldo', c.saldo, true],
+  ];
+  if (o) resumen.push(['Objetivo por día', o.obj, true], ['Te sobra si lo cumplís', o.proyectado, true]);
+  if (c.fondo.activo) resumen.push(['Ahorrado en el período', c.fondo.ahorroPeriodo, true], ['Fondo de ahorro total', c.fondo.totalConRend, true]);
+  return {
+    hoy, fecha, resumen,
+    dias: dias.map(x => ({ fecha: fecha(x.iso), dia: x.dia, presupuesto: x.presupuesto, gasto: x.gasto, sobra: x.sobra,
+      pasado: x.i <= c.hoyIdx || !!x.gasto })),
+    gastos: [...S.spent].sort((a, b) => a.date.localeCompare(b.date) || a.id - b.id).map(e => ({
+      fecha: fecha(e.date), cat: e.cat || '', nota: e.note || '', amt: e.amt, tipo: e.meta ? 'Aporte a meta' : 'Gasto' })),
+    importantes: S.items.filter(i => i.n || i.a).map(i => ({ n: i.n || '', a: montoDe(i), estado: i.p ? 'Pagado' : 'Pendiente',
+      cuotas: tieneCuotas(i) ? i.q.actual + ' de ' + i.q.total : '' })),
+  };
+}
+
+/* ---------- Excel ---------- */
+const xmlEsc = s => String(s).replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g, '')
+  .replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const XT = s => ({ s, b: 1 }), XM = n => ({ m: n });          // XT: texto en negrita · XM: monto en pesos
+function celdaXlsx(v, r, c) {
+  if (v === '' || v == null) return '';
+  const ref = String.fromCharCode(65 + c) + (r + 1);
+  if (typeof v === 'number') return Number.isFinite(v) ? `<c r="${ref}"><v>${v}</v></c>` : '';
+  if (v.m !== undefined) return Number.isFinite(v.m) ? `<c r="${ref}" s="2"><v>${Math.round(v.m * 100) / 100}</v></c>` : '';
+  const texto = v.s !== undefined ? v.s : v;
+  return `<c r="${ref}" t="inlineStr"${v.b ? ' s="1"' : ''}><is><t xml:space="preserve">${xmlEsc(texto)}</t></is></c>`;
+}
+function hojaXlsx(filas, anchos) {
+  return '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">' +
+    '<cols>' + anchos.map((w, i) => `<col min="${i + 1}" max="${i + 1}" width="${w}" customWidth="1"/>`).join('') + '</cols><sheetData>' +
+    filas.map((f, r) => `<row r="${r + 1}">${f.map((v, c) => celdaXlsx(v, r, c)).join('')}</row>`).join('') + '</sheetData></worksheet>';
+}
+function xlsxExportar(d) {
+  const hojas = [
+    ['Resumen', [[XT('Mi plata'), XT('Resumen del período')]].concat(d.resumen.map(r => [r[0], r[2] ? XM(r[1]) : r[1]])), [30, 26]],
+    ['Días', [[XT('Fecha'), XT('Día'), XT('Presupuesto'), XT('Gasto'), XT('Sobrante')]].concat(
+      d.dias.map(x => [x.fecha, x.dia, XM(x.presupuesto), x.gasto ? XM(x.gasto) : '', x.pasado ? XM(x.sobra) : ''])), [14, 12, 16, 16, 16]],
+    ['Gastos anotados', [[XT('Fecha'), XT('Categoría'), XT('Detalle'), XT('Monto'), XT('Tipo')]].concat(
+      d.gastos.map(x => [x.fecha, x.cat, x.nota, XM(x.amt), x.tipo])), [14, 16, 36, 16, 16]],
+    ['Gastos importantes', [[XT('Concepto'), XT('Monto'), XT('Estado'), XT('Cuotas')]].concat(
+      d.importantes.map(x => [x.n, XM(x.a), x.estado, x.cuotas])), [34, 16, 14, 12]],
+  ];
+  const ns = 'http://schemas.openxmlformats.org/spreadsheetml/2006/main', rel = 'http://schemas.openxmlformats.org/officeDocument/2006/relationships';
+  const cab = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
+  const archivos = [
+    ['[Content_Types].xml', cab + '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/>' +
+      '<Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>' +
+      '<Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>' +
+      hojas.map((h, i) => `<Override PartName="/xl/worksheets/sheet${i + 1}.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>`).join('') + '</Types>'],
+    ['_rels/.rels', cab + `<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="${rel}/officeDocument" Target="xl/workbook.xml"/></Relationships>`],
+    ['xl/workbook.xml', cab + `<workbook xmlns="${ns}" xmlns:r="${rel}"><sheets>` +
+      hojas.map((h, i) => `<sheet name="${xmlEsc(h[0])}" sheetId="${i + 1}" r:id="rId${i + 1}"/>`).join('') + '</sheets></workbook>'],
+    ['xl/_rels/workbook.xml.rels', cab + '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">' +
+      hojas.map((h, i) => `<Relationship Id="rId${i + 1}" Type="${rel}/worksheet" Target="worksheets/sheet${i + 1}.xml"/>`).join('') +
+      `<Relationship Id="rId${hojas.length + 1}" Type="${rel}/styles" Target="styles.xml"/></Relationships>`],
+    ['xl/styles.xml', cab + `<styleSheet xmlns="${ns}"><numFmts count="1"><numFmt numFmtId="164" formatCode="&quot;$&quot;#,##0;[Red]\\-&quot;$&quot;#,##0"/></numFmts>` +
+      '<fonts count="2"><font><sz val="11"/><name val="Calibri"/></font><font><b/><sz val="11"/><name val="Calibri"/></font></fonts>' +
+      '<fills count="2"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill></fills>' +
+      '<borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders>' +
+      '<cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs>' +
+      '<cellXfs count="3"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/><xf numFmtId="0" fontId="1" fillId="0" borderId="0" xfId="0" applyFont="1"/>' +
+      '<xf numFmtId="164" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1"/></cellXfs><cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>'],
+  ].concat(hojas.map((h, i) => [`xl/worksheets/sheet${i + 1}.xml`, hojaXlsx(h[1], h[2])]));
+  return crearZip(archivos.map(a => ({ n: a[0], d: aBytes(a[1]) })));
+}
+
+/* ---------- PDF (texto con letra de ancho fijo, páginas A4) ---------- */
+const pdfTxt = s => String(s).replace(/[–—]/g, '-').replace(/…/g, '...').replace(/[“”]/g, '"').replace(/[‘’]/g, "'")
+  .replace(/[^\x20-\xFF]/g, '').replace(/[\\()]/g, '\\$&');
+function crearPdf(lineas, pie) {
+  const TOPE = 800, BASE = 50, ALTO_LINEA = 12.5, porPagina = Math.floor((TOPE - BASE) / ALTO_LINEA);
+  const paginas = [];
+  for (let i = 0; i < lineas.length; i += porPagina) paginas.push(lineas.slice(i, i + porPagina));
+  if (!paginas.length) paginas.push([{ t: '' }]);
+  const objetos = [
+    '<< /Type /Catalog /Pages 2 0 R >>',
+    `<< /Type /Pages /Kids [${paginas.map((_, k) => (6 + k * 2) + ' 0 R').join(' ')}] /Count ${paginas.length} >>`,
+    '<< /Type /Font /Subtype /Type1 /BaseFont /Courier /Encoding /WinAnsiEncoding >>',
+    '<< /Type /Font /Subtype /Type1 /BaseFont /Courier-Bold /Encoding /WinAnsiEncoding >>',
+    '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>',
+  ];
+  paginas.forEach((pagina, k) => {
+    let y = TOPE, cs = '';
+    pagina.forEach(l => {
+      cs += `BT /${l.g ? 'F3' : l.b ? 'F2' : 'F1'} ${l.g ? 16 : 9.5} Tf 40 ${y.toFixed(1)} Td (${pdfTxt(l.t)}) Tj ET\n`;
+      y -= ALTO_LINEA;
+    });
+    cs += `BT /F1 8 Tf 40 28 Td (${pdfTxt(pie + '  -  pagina ' + (k + 1) + ' de ' + paginas.length)}) Tj ET\n`;
+    objetos.push(`<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents ${7 + k * 2} 0 R >>`);
+    objetos.push(`<< /Length ${cs.length} >>\nstream\n${cs}endstream`);
+  });
+  let pdf = '%PDF-1.4\n%\u00e2\u00e3\u00cf\u00d3\n'; const offsets = [];
+  objetos.forEach((o, i) => { offsets.push(pdf.length); pdf += `${i + 1} 0 obj\n${o}\nendobj\n`; });
+  const xref = pdf.length;
+  pdf += `xref\n0 ${objetos.length + 1}\n0000000000 65535 f \n` + offsets.map(o => String(o).padStart(10, '0') + ' 00000 n \n').join('') +
+    `trailer\n<< /Size ${objetos.length + 1} /Root 1 0 R >>\nstartxref\n${xref}\n%%EOF`;
+  return Uint8Array.from(pdf, ch => ch.charCodeAt(0));
+}
+function pdfExportar(d) {
+  const izq = (t, n) => String(t).slice(0, n).padEnd(n), der = (t, n) => String(t).slice(0, n).padStart(n);
+  const L = [{ t: 'Mi plata - Resumen', g: 1 }, { t: '' }, { t: 'Creado el ' + d.fecha(d.hoy), b: 0 }, { t: '' }, { t: 'RESUMEN', b: 1 }];
+  d.resumen.forEach(r => L.push({ t: izq(r[0], 34) + der(r[2] ? pesos(r[1]) : r[1], r[2] ? 16 : 28) }));
+  L.push({ t: '' }, { t: 'DIA POR DIA', b: 1 }, { t: izq('Dia', 15) + der('Presupuesto', 14) + der('Gasto', 14) + der('Sobrante', 14), b: 1 });
+  d.dias.forEach(x => L.push({ t: izq(x.dia.slice(0, 3) + ' ' + x.fecha, 15) + der(pesos(x.presupuesto), 14) +
+    der(x.gasto ? pesos(x.gasto) : '', 14) + der(x.pasado ? pesos(x.sobra) : '', 14) }));
+  L.push({ t: '' }, { t: 'GASTOS ANOTADOS', b: 1 });
+  if (!d.gastos.length) L.push({ t: 'Todavia no hay gastos anotados.' });
+  d.gastos.forEach(x => L.push({ t: izq(x.fecha.slice(0, 5), 7) +
+    izq((x.tipo === 'Gasto' ? (x.cat ? x.cat + ' - ' : '') : '') + (x.nota || x.tipo), 46) + der(pesos(x.amt), 14) }));
+  L.push({ t: '' }, { t: 'GASTOS IMPORTANTES', b: 1 });
+  if (!d.importantes.length) L.push({ t: 'No cargaste gastos importantes.' });
+  d.importantes.forEach(x => L.push({ t: izq(x.n, 34) + der(pesos(x.a), 14) + '  ' + x.estado + (x.cuotas ? ' (cuota ' + x.cuotas + ')' : '') }));
+  return crearPdf(L, 'Mi plata v' + VERSION_APP);
+}
+
+/* =====================================================================
+   03 · ESTADO — los datos de la persona: cargar, guardar y accesos.
+   Misma clave de siempre, así que los datos de versiones anteriores
+   siguen funcionando sin migrar nada.
+   ===================================================================== */
+const VERSION = VERSION_APP;
+const AUTOR = 'Martín Enrique Bustos';
+const AUTOR_EMAIL = 'bustosmartin181@gmail.com';
+const AUTOR_WA = '5492612168515';
+const CLAVE_DATOS = 'miplata_v2';
+const CLAVE_REAL = 'miplata_real_antes_demo';   // tus datos reales mientras dura el modo demo
+
+let S = cargarEstado();
+
+function cargarEstado() {
+  let guardado = null;
+  try { guardado = JSON.parse(localStorage.getItem(CLAVE_DATOS)); } catch (_) {}
+  return migrarEstado((guardado && guardado.items) ? guardado : estadoInicial(hoyISO()));
+}
+function guardarLocal() {
+  try { localStorage.setItem(CLAVE_DATOS, JSON.stringify(S)); } catch (_) {}
+}
+/* Resumen para el widget de Android "Mi plata — Hoy" (solo en la app instalada).
+   Lo lee el widget desde el archivo widget.json de la carpeta interna de la app. */
+let temporizadorWidget = null;
+function actualizarWidgetResumen() {
+  if (!CONFIG.apk || S.demo) return;
+  clearTimeout(temporizadorWidget);
+  temporizadorWidget = setTimeout(async () => {
+    try {
+      const plugins = window.Capacitor && window.Capacitor.Plugins;
+      if (!plugins || !plugins.Filesystem || !S.bienvenida) return;
+      const hoy = hoyISO(), c = calcular(S, hoy), o = objetivoDiario(S, hoy);
+      const clase = semaforo(c, S)[0];
+      const resumen = {
+        quedaHoy: Math.round(c.quedaHoy), gastoHoy: Math.round(c.gastoHoy), saldo: Math.round(c.saldo),
+        color: clase === 'neg' ? 'neg' : clase === 'warn' ? 'warn' : 'ok',
+        oculto: S.ocultar === true,
+        objetivo: o ? Math.round(o.obj) : 0, objetivoSobra: o ? Math.round(o.proyectado) : 0,
+        fecha: hoy, upd: Date.now(), version: VERSION,
+      };
+      await plugins.Filesystem.writeFile({ path: 'widget.json', data: JSON.stringify(resumen), directory: 'DATA', encoding: 'utf8' });
+    } catch (_) { /* silencioso: el widget muestra el último dato */ }
+  }, 400);
+}
+
+function guardar() {            // todo cambio pasa por acá
+  if (S.ingresos) S.sueldo = totalIngresos(S);    // el sueldo es la suma de los ingresos
+  S.upd = Date.now();
+  guardarLocal();
+  actualizarWidgetResumen();
+  subirANube();
+}
+
+/* Listas que se crean la primera vez que se usan */
+const cuentasDe = () => S.cuentas || (S.cuentas = [
+  { n: 'Banco', m: 0 }, { n: 'Mercado Pago', m: 0 }, { n: 'Efectivo', m: 0 }]);
+const metasDe = () => S.metas || (S.metas = [{ id: 1, n: 'Mi meta', t: 0, g0: 0, f: '' }]);
+const nombreUsuario = () => S.demo ? 'Martín' : (S.nombre === undefined ? '' : S.nombre);
+
+/* Estado de la pantalla (no se guarda) */
+const UI = {
+  pestana: 'hoy',
+  paso: 0,               // introducción: 0 bienvenida, 1 cómo funciona, 2 confianza, 3 ingresos, 4 gastos, 5 listo
+  verTodos: false,       // en Hoy: ¿se ven todos los gastos o solo los últimos 5?
+  categoria: '',         // categoría elegida para el gasto que se está anotando
+  editando: null,        // id del gasto que se está editando
+  borrador: {},          // monto y detalle que llegan por voz o foto
+  ajustePendiente: null, // diferencia de cuentas esperando confirmación
+  mostrarDinero: false,  // ¿se muestran los números del mes?
+  respuestaIA: '', pensando: false, ultimaPregunta: '',
+  abiertos: {},          // secciones desplegables que están abiertas (todas arrancan cerradas)
+};
+
+/* =====================================================================
+   04 · SEGURIDAD — PIN, bloqueo automático y ocultar el dinero del mes.
+   ===================================================================== */
+const ACCIONES_PROTEGIDAS = [
+  'ajustarCuentas', 'csvDias', 'csvImportantes', 'guardarNube', 'guardarEnTelefono', 'exportarXlsx', 'exportarPdf', 'recuperarNube', 'restaurar', 'borrarTodo', 'restaurarCierre', 'activarDemo', 'salirDemo'];
+/* En modo demo no se guardan copias ni se restauran datos: así los datos de ejemplo nunca pisan los reales */
+const BLOQUEADAS_EN_DEMO = ['guardarNube', 'guardarEnTelefono', 'recuperarNube', 'restaurar', 'borrarTodo', 'restaurarCierre'];
+
+let bloqueada = !!S.pin && S.pinApp !== false;
+let intentos = leerIntentos();
+let momentoSegundoPlano = 0, temporizadorInactividad;
+
+const pinPideAlAbrir = () => !!S.pin && S.pinApp !== false;
+const dineroOculto = () => S.ocultar === true && !UI.mostrarDinero;      // por defecto los números se ven; se ocultan solo si lo activás en Ajustes
+
+/* --- PIN guardado con sal y derivación lenta (PBKDF2) --- */
+const aHex = b => [...new Uint8Array(b)].map(x => x.toString(16).padStart(2, '0')).join('');
+async function hashPin(pin, sal) {
+  const texto = 'miplata:' + pin, cod = new TextEncoder();
+  try {
+    if (!sal) return aHex(await crypto.subtle.digest('SHA-256', cod.encode(texto))); // PINs de versiones viejas
+    const llave = await crypto.subtle.importKey('raw', cod.encode(texto), 'PBKDF2', false, ['deriveBits']);
+    return aHex(await crypto.subtle.deriveBits(
+      { name: 'PBKDF2', salt: cod.encode(sal), iterations: 150000, hash: 'SHA-256' }, llave, 256));
+  } catch (_) {
+    let h = 0; for (const ch of texto + (sal || '')) h = (h * 31 + ch.charCodeAt(0)) | 0;
+    return 'f' + h;
+  }
+}
+const pinCorrecto = async pin => (await hashPin(pin, S.salt)) === S.pin;
+async function fijarPin(pin) {
+  let sal; try { sal = aHex(crypto.getRandomValues(new Uint8Array(12))); } catch (_) { sal = String(Date.now()); }
+  S.salt = sal; S.pin = await hashPin(pin, sal);
+}
+
+/* --- intentos fallidos: persisten aunque se cierre la app --- */
+function leerIntentos() { try { return JSON.parse(localStorage.getItem('miplata_sec')) || {}; } catch (_) { return {}; } }
+function guardarIntentos() { try { localStorage.setItem('miplata_sec', JSON.stringify(intentos)); } catch (_) {} }
+function registrarFallo() {
+  intentos.f = (intentos.f || 0) + 1;
+  if (intentos.f >= 5) intentos.u = Date.now() + Math.min(900, 30 * Math.pow(2, intentos.f - 5)) * 1000;
+  guardarIntentos();
+}
+const segundosDeEspera = () =>
+  intentos.u && Date.now() < intentos.u ? Math.ceil((intentos.u - Date.now()) / 1000) : 0;
+function limpiarFallos() { intentos = {}; guardarIntentos(); }
+
+/* Intenta con un PIN. Devuelve true si es correcto; si no, avisa. */
+async function probarPin(pin, campo) {
+  if (segundosDeEspera()) { aviso('Esperá ' + segundosDeEspera() + ' segundos.'); return false; }
+  if (await pinCorrecto(pin)) { limpiarFallos(); return true; }
+  registrarFallo(); if (campo) campo.value = ''; aviso('PIN incorrecto.');
+  return false;
+}
+
+/* Ventanita que pide el PIN. Devuelve true/false. */
+function pedirPin(textoBoton = 'Mostrar') {
+  return new Promise(resolver => {
+    const m = crearModal(
+      '<div style="font-weight:700;margin-bottom:10px">Ingresá tu PIN</div>' +
+      '<input id="rp" type="password" inputmode="numeric" maxlength="8" style="text-align:center;font-size:22px;letter-spacing:6px">' +
+      '<div class="f" style="margin-top:12px;justify-content:center"><button id="rok">' + textoBoton +
+      '</button><button class="sec" id="rno">Cancelar</button></div>', 320, 20, 'text-align:center');
+    const campo = m.querySelector('#rp'); campo.focus();
+    const cerrar = v => { m.remove(); resolver(v); };
+    m.querySelector('#rno').onclick = () => cerrar(false);
+    m.querySelector('#rok').onclick = async () => { if (await probarPin(campo.value, campo)) cerrar(true); };
+    campo.onkeydown = e => { if (e.key === 'Enter') m.querySelector('#rok').click(); };
+  });
+}
+
+/* Pantalla de bloqueo */
+async function desbloquear() {
+  const campo = document.getElementById('pin'); if (!campo) return;
+  if (!(await probarPin(campo.value, campo))) return;
+  bloqueada = false;
+  if (!S.salt) { await fijarPin(campo.value); guardar(); }   // actualiza PINs viejos
+  dibujar();
+}
+
+/* Activar, cambiar o quitar el PIN (op: 'on' | 'change' | 'off') */
+async function operacionPin(op) {
+  const valor = id => (document.getElementById(id) || {}).value || '', formato = /^\d{4,8}$/;
+  if (op === 'on') {
+    const nuevo = valor('pn');
+    if (!formato.test(nuevo) || nuevo !== valor('pr')) { aviso('El PIN debe tener 4 a 8 números y coincidir en los dos campos.'); return; }
+    await fijarPin(nuevo); guardar(); aviso('PIN activado.'); dibujar(); return;
+  }
+  if (!(await pinCorrecto(valor('pa')))) { aviso('El PIN actual no coincide.'); return; }
+  if (op === 'off') { delete S.pin; delete S.salt; guardar(); aviso('PIN desactivado.'); dibujar(); return; }
+  const nuevo = valor('pn');
+  if (!formato.test(nuevo)) { aviso('El PIN nuevo debe tener 4 a 8 números.'); return; }
+  await fijarPin(nuevo); guardar(); aviso('PIN cambiado.'); dibujar();
+}
+
+/* Mostrar u ocultar el dinero del mes (pide PIN si hay uno) */
+async function mostrarOcultarDinero() {
+  if (UI.mostrarDinero) { UI.mostrarDinero = false; dibujar(); return; }
+  if (S.pin && !(await pedirPin())) return;
+  UI.mostrarDinero = true; dibujar();
+}
+
+/* Bloqueo por inactividad y al volver de otra app */
+function bloquearAhora() {
+  UI.mostrarDinero = false;
+  if (pinPideAlAbrir()) bloqueada = true;
+  dibujar();
+}
+function reiniciarInactividad() {
+  clearTimeout(temporizadorInactividad);
+  if (S.pin) temporizadorInactividad = setTimeout(bloquearAhora, 120000);
+}
+function alCambiarVisibilidad() {
+  if (document.hidden) {
+    momentoSegundoPlano = Date.now(); document.body.classList.add('pv');   // difumina la vista previa
+  } else {
+    if (Date.now() - momentoSegundoPlano > 60000) bloquearAhora();
+    document.body.classList.remove('pv');
+    traerDeNube().then(cerrarDias);
+  }
+}
+
+/* =====================================================================
+   05 · NUBE — sincroniza con la cuenta de Claude (solo si está disponible).
+   En la versión instalable (PWA) esto no hace nada.
+   ===================================================================== */
+let docNube = null, temporizadorSubida;
+let mensajeNube = CONFIG.nube ? 'Sin sincronizar (solo este teléfono)' : 'Datos guardados en este teléfono';
+const esperar = ms => new Promise(r => setTimeout(r, ms));
+
+async function iniciarNube() {
+  if (!CONFIG.nube) return;
+  try {
+    for (let i = 0; i < 20 && !window.claude; i++) await esperar(250);   // el entorno de Claude tarda en aparecer
+    if (!window.claude) return;
+    const db = await window.claude.use('db'), usuario = await window.claude.use('user');
+    if (!db || !usuario) return;
+    const id = await usuario.id(); if (!id) return;
+    docNube = db.doc('data/users/' + id + '/estado');
+    await traerDeNube();
+  } catch (_) {}
+}
+
+/* Gana siempre la copia más nueva */
+async function traerDeNube() {
+  if (!docNube || S.demo) return;
+  try {
+    const foto = await docNube.get(), remoto = foto.exists ? foto.data() : null;
+    if (remoto && remoto.json && (remoto.upd || 0) > (S.upd || 0)) {
+      const teniaPin = !!S.pin;
+      S = migrarEstado(JSON.parse(remoto.json));
+      if (S.pin && !teniaPin && S.pinApp !== false) bloqueada = true;
+      guardarLocal(); mensajeNube = 'Sincronizado con la nube'; dibujar();
+    } else if (!remoto || (remoto.upd || 0) < (S.upd || 0) || !S.upd) {
+      if (!S.upd) S.upd = Date.now();
+      await subirANube(true);
+    } else { mensajeNube = 'Sincronizado con la nube'; dibujar(); }
+  } catch (_) { mensajeNube = 'No se pudo sincronizar'; dibujar(); }
+}
+
+async function subirANube(inmediato) {
+  if (!docNube || S.demo) return;
+  clearTimeout(temporizadorSubida);
+  const subir = async () => {
+    try { await docNube.set({ json: JSON.stringify(S), upd: S.upd || Date.now() }); mensajeNube = 'Sincronizado con la nube'; }
+    catch (_) { mensajeNube = 'No se pudo sincronizar'; }
+    dibujar();
+  };
+  if (inmediato) await subir(); else temporizadorSubida = setTimeout(subir, 800);
+}
+
+/* =====================================================================
+   06 · FUNCIONES CON CLAUDE Y VOZ — preguntas, dictado y foto de ticket.
+   Solo se usan cuando CONFIG.claude está prendido (versión dentro de Claude).
+   ===================================================================== */
+const hayClaude = () => CONFIG.claude && !!window.claude;
+
+async function preguntarAClaude(pregunta) {
+  UI.ultimaPregunta = pregunta;
+  const ia = hayClaude() ? await window.claude.use('sample') : null;
+  if (!ia) { UI.respuestaIA = 'Esta función no está disponible ahora.'; dibujar(); return; }
+  UI.pensando = true; UI.respuestaIA = ''; dibujar();
+  const c = calcular(S, hoyISO());
+  const datos = {
+    hoy: hoyISO(), periodo: { inicio: S.start, fin: S.end }, sueldo: S.sueldo, saldo_previo: S.previo,
+    gastos_importantes: S.items.filter(i => i.n).map(i => ({ concepto: i.n, monto: i.a, pagado: i.p })),
+    base_por_dia: Math.round(c.base), te_queda_hoy: Math.round(c.quedaHoy),
+    presupuesto_manana: c.manana == null ? null : Math.round(c.manana),
+    saldo_del_periodo: Math.round(c.saldo),
+    gastos_diarios: S.spent.map(e => ({ fecha: e.date, monto: e.amt, detalle: e.note || '', categoria: e.cat || '' })),
+  };
+  try {
+    const r = await ia('Sos un asistente de finanzas personales en Argentina (pesos). Respondé en español rioplatense, breve y claro, con números concretos. Usá solo estos datos:\n' +
+      JSON.stringify(datos) + '\n\nPregunta: ' + pregunta,
+      { onText: parcial => { UI.respuestaIA = parcial.text; pintarRespuesta(); }, cache: false });
+    UI.respuestaIA = r.text;
+  } catch (e) {
+    UI.respuestaIA = (e && e.code === 'not_granted') ? 'Necesito tu permiso para responder.' : 'No pude responder ahora. Probá de nuevo.';
+  }
+  UI.pensando = false; dibujar();
+}
+function pintarRespuesta() { const el = document.getElementById('ans'); if (el) el.textContent = UI.respuestaIA; }
+
+/* Saca monto y detalle de una frase o de la foto de un ticket */
+async function extraerGasto(texto, imagenes) {
+  let dato = null;
+  try {
+    const ia = hayClaude() ? await window.claude.use('sample') : null;
+    if (ia) dato = await ia('Extraé un gasto en pesos argentinos. Respondé SOLO un JSON {"monto":número,"detalle":"texto corto"}. Si el monto está dicho con palabras (tres mil quinientos), pasalo a número. ' + texto,
+      imagenes.length ? { images: imagenes, cache: false } : { cache: false });
+  } catch (_) {}
+  if (!dato || !dato.monto) {      // sin IA: se busca el primer número de la frase
+    const m = texto.replace(/\./g, '').match(/\d+(,\d+)?/);
+    if (m) dato = { monto: aNumero(m[0]), detalle: texto.slice(0, 40) };
+  }
+  if (dato && dato.monto) {
+    UI.borrador = { amt: dato.monto, note: dato.detalle || '' }; UI.editando = null; dibujar();
+    aviso('Revisá el monto y tocá Anotar gasto.');
+  } else aviso('No pude sacar el monto. Probá de nuevo.');
+}
+
+/* Dictado de gastos: entiende frases como "quince mil quinientos en el súper" sin internet y sin IA */
+const NUM_PALABRAS = {cero:0,un:1,uno:1,una:1,dos:2,tres:3,cuatro:4,cinco:5,seis:6,siete:7,ocho:8,nueve:9,diez:10,once:11,doce:12,trece:13,catorce:14,quince:15,dieciseis:16,diecisiete:17,dieciocho:18,diecinueve:19,veinte:20,veintiun:21,veintiuno:21,veintidos:22,veintitres:23,veinticuatro:24,veinticinco:25,veintiseis:26,veintisiete:27,veintiocho:28,veintinueve:29,treinta:30,cuarenta:40,cincuenta:50,sesenta:60,setenta:70,ochenta:80,noventa:90,cien:100,ciento:100,doscientos:200,doscientas:200,trescientos:300,trescientas:300,cuatrocientos:400,cuatrocientas:400,quinientos:500,quinientas:500,seiscientos:600,seiscientas:600,setecientos:700,setecientas:700,ochocientos:800,ochocientas:800,novecientos:900,novecientas:900,mil:1000,luca:1000,lucas:1000,millon:1e6,millones:1e6,palo:1e6,palos:1e6};
+const CLAVES_CAT = [
+  ['Súper', ['super','supermercado','mercado','almacen','chino','hipermercado']],
+  ['Transporte', ['nafta','combustible','gasoil','colectivo','bondi','sube','taxi','uber','remis','peaje','estacionamiento','cochera','pasaje']],
+  ['Salud', ['farmacia','remedio','remedios','medico','doctor','dentista','consulta','medicamento','pastillas','analisis']],
+  ['Salidas', ['cine','salida','boliche','bar','birra','cerveza','cervezas','restaurante','asado','recital','entrada','pelicula','juntada']],
+  ['Comida', ['comida','almuerzo','cena','desayuno','merienda','pizza','pizzas','carne','carniceria','pan','panaderia','verduleria','verdura','fruta','kiosco','cafe','empanadas','helado','gaseosa','bebida','hamburguesa','milanesa','facturas']],
+];
+const RELLENO_DICTADO = new Set(['de','en','el','la','los','las','un','una','por','con','para','a','al','que','pesos','peso','ars','gaste','gasto','pague','pago','compre','me','salio','salieron','fue','fueron','mi','mis','y']);
+const sinTilde = s => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+const esDigito = t => /^\d/.test(t);
+const esNumPalabra = t => Object.prototype.hasOwnProperty.call(NUM_PALABRAS, t);
+const esNum = t => esDigito(t) || esNumPalabra(t);
+function numDigitos(t) {
+  if (/^\d{1,3}(,\d{3})+$/.test(t)) t = t.replace(/,/g, '');
+  t = t.replace(/\.(?=\d{3}(?:\D|$))/g, '').replace(',', '.');
+  const n = parseFloat(t); return isNaN(n) ? 0 : n;
+}
+function valorNumero(toks) {
+  let total = 0, actual = 0;
+  for (const t of toks) {
+    if (t === 'y') continue;
+    if (esDigito(t)) { actual += numDigitos(t); continue; }
+    const v = NUM_PALABRAS[t];
+    if (v >= 1000) { total += (actual || 1) * v; actual = 0; } else actual += v;
+  }
+  return Math.round((total + actual) * 100) / 100;
+}
+/* Devuelve { monto, detalle, cat } o null si no encuentra un monto */
+function gastoDesdeFrase(texto) {
+  const orig = String(texto).toLowerCase().replace(/[$¿?¡!;:()"]/g, ' ').split(/\s+/).filter(Boolean).map(t => t.replace(/[.,]+$/, '')).filter(Boolean);
+  const norm = orig.map(sinTilde);
+  let mejor = null;
+  for (let i = 0; i < norm.length; i++) {
+    if (!esNum(norm[i])) continue;
+    let j = i;
+    while (j + 1 < norm.length) {
+      if (esNum(norm[j + 1])) j++;
+      else if (norm[j + 1] === 'y' && j + 2 < norm.length && esNum(norm[j + 2]) && !esDigito(norm[j]) && !esDigito(norm[j + 2])) j += 2;
+      else break;
+    }
+    const valor = valorNumero(norm.slice(i, j + 1));
+    if (valor > 0 && (!mejor || valor > mejor.valor)) mejor = { ini: i, fin: j, valor };
+    i = j;
+  }
+  if (!mejor) return null;
+  const resto = orig.map((t, k) => [t, norm[k], k]).filter(x => x[2] < mejor.ini || x[2] > mejor.fin);
+  while (resto.length && RELLENO_DICTADO.has(resto[0][1])) resto.shift();
+  while (resto.length && RELLENO_DICTADO.has(resto[resto.length - 1][1])) resto.pop();
+  let detalle = resto.map(x => x[0]).join(' ');
+  detalle = detalle.charAt(0).toUpperCase() + detalle.slice(1);
+  const palabras = new Set(resto.map(x => x[1]));
+  let cat = '';
+  for (const [nombre, claves] of CLAVES_CAT) if (claves.some(c => palabras.has(c))) { cat = nombre; break; }
+  return { monto: mejor.valor, detalle, cat };
+}
+
+function usarFraseDictada(t) {
+  if (hayClaude()) { aviso('Escuché: ' + t); extraerGasto('Frase: ' + t, []); return; }
+  const g = gastoDesdeFrase(t);
+  if (!g) { aviso('Escuché: «' + t + '». No entendí el monto, probá de nuevo.'); return; }
+  UI.borrador = { amt: g.monto, note: g.detalle }; UI.editando = null;
+  if (g.cat) UI.categoria = g.cat;
+  dibujar();
+  aviso('Escuché: ' + t + '. Revisá y tocá Anotar gasto.');
+}
+
+async function dictarGasto() {
+  const SR = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.SpeechRecognition;
+  if (SR) {            // dentro del APK: dictado nativo de Android
+    try {
+      const disp = await SR.available();
+      if (!disp || !disp.available) { aviso('Este teléfono no tiene dictado por voz. Usá el micrófono del teclado.'); return; }
+      let permiso = await SR.checkPermissions();
+      if (permiso.speechRecognition !== 'granted') permiso = await SR.requestPermissions();
+      if (permiso.speechRecognition !== 'granted') { aviso('Sin permiso de micrófono no puedo escucharte. Podés darlo en Ajustes del teléfono → Apps → Mi plata → Permisos.'); return; }
+      const r = await SR.start({ language: 'es-AR', maxResults: 3, prompt: 'Decí el gasto. Ej: quince mil en el súper', partialResults: false, popup: true });
+      const t = r && r.matches && r.matches[0];
+      if (t) usarFraseDictada(t); else aviso('No te escuché. Probá de nuevo.');
+    } catch (_) { aviso('No se pudo dictar. Probá de nuevo o usá el micrófono del teclado.'); }
+    return;
+  }
+  const Reconocedor = window.SpeechRecognition || window.webkitSpeechRecognition;   // versión web
+  if (!Reconocedor) { aviso('Acá no hay dictado. Usá el micrófono del teclado del teléfono.'); return; }
+  const r = new Reconocedor(); r.lang = 'es-AR'; r.interimResults = false;
+  r.onresult = ev => usarFraseDictada(ev.results[0][0].transcript);
+  r.onerror = () => aviso('No pude usar el micrófono acá. Probá con el micrófono del teclado.');
+  try { r.start(); aviso('Escuchando… decí el gasto'); } catch (_) { aviso('No pude usar el micrófono.'); }
+}
+
+async function leerTicket(archivo) {
+  try {
+    const bmp = await createImageBitmap(archivo), k = Math.min(1, 1280 / Math.max(bmp.width, bmp.height));
+    const lienzo = document.createElement('canvas');
+    lienzo.width = Math.round(bmp.width * k); lienzo.height = Math.round(bmp.height * k);
+    lienzo.getContext('2d').drawImage(bmp, 0, 0, lienzo.width, lienzo.height);
+    const jpg = await new Promise(r => lienzo.toBlob(r, 'image/jpeg', 0.8));
+    aviso('Leyendo el ticket…');
+    await extraerGasto('Es la foto de un ticket o comprobante. El monto es el TOTAL pagado y el detalle es el comercio.', [jpg]);
+  } catch (_) { aviso('No pude leer la foto.'); }
+}
+
+/* =====================================================================
+   07 · COMÚN — avisos, ventanas, tema, descargas. Piezas que usan todos.
+   ===================================================================== */
+
+function aviso(texto) {
+  const d = document.createElement('div'); d.className = 'toast'; d.textContent = texto;
+  document.body.appendChild(d); setTimeout(() => d.remove(), 4500);
+}
+function pitido() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)(), o = ctx.createOscillator();
+    o.connect(ctx.destination); o.frequency.value = 880; o.start();
+    setTimeout(() => { o.stop(); ctx.close(); }, 350);
+  } catch (_) {}
+}
+
+/* Ventana flotante. Devuelve el fondo; el contenido va en una tarjeta. */
+function crearModal(html, anchoMax, capa = 20, estiloTarjeta = '') {
+  const fondo = document.createElement('div');
+  fondo.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;z-index:' + capa + ';padding:20px';
+  fondo.innerHTML = '<div class="card" style="width:100%;max-width:' + anchoMax + 'px;margin:0;' + estiloTarjeta + '">' + html + '</div>';
+  document.body.appendChild(fondo);
+  return fondo;
+}
+function confirmar(mensaje) {       // reemplaza a confirm(), que está bloqueado dentro de Claude
+  return new Promise(resolver => {
+    const m = crearModal('<div id="cmsg" style="margin-bottom:14px"></div><div class="f" style="justify-content:flex-end;margin:0">' +
+      '<button class="sec" id="cno">Cancelar</button><button id="csi">Aceptar</button></div>', 340, 25);
+    m.querySelector('#cmsg').textContent = mensaje;
+    m.querySelector('#csi').onclick = () => { m.remove(); resolver(true); };
+    m.querySelector('#cno').onclick = () => { m.remove(); resolver(false); };
+  });
+}
+
+/* Dinero que puede estar oculto */
+const dinero = n => dineroOculto() ? '••••••' : pesos(n);
+const etiquetaOjo = () => dineroOculto() ? '👁 Mostrar' : '🙈 Ocultar';
+
+/* Tema y color: [claro, oscuro, texto sobre claro, texto sobre oscuro] */
+const PALETAS = {
+  azul: ['#0b5cad', '#5aa7f5', '#fff', '#08121f'], verde: ['#1b7f4b', '#4ade80', '#fff', '#06210f'],
+  violeta: ['#6d3fc0', '#b794f6', '#fff', '#1a0b33'], naranja: ['#c2570c', '#fb923c', '#fff', '#2b1100'],
+  rojo: ['#b42318', '#f87171', '#fff', '#2a0a08'],
+};
+function aplicarTema() {
+  const tema = S.tema || 'auto', raiz = document.documentElement;
+  if (tema === 'auto') raiz.removeAttribute('data-theme');
+  else raiz.setAttribute('data-theme', tema === 'oscuro' ? 'dark' : 'light');
+  const oscuro = tema === 'oscuro' || (tema === 'auto' && matchMedia('(prefers-color-scheme: dark)').matches);
+  const p = PALETAS[S.color || 'azul'] || PALETAS.azul;
+  raiz.style.setProperty('--ac', oscuro ? p[1] : p[0]);
+  raiz.style.setProperty('--acx', oscuro ? p[3] : p[2]);
+}
+
+/* Archivos */
+const csvDe = filas => '\ufeff' + filas.map(f => f.map(x => {
+  x = String(x); return /[;"\n]/.test(x) ? '"' + x.replace(/"/g, '""') + '"' : x;
+}).join(';')).join('\r\n');
+
+/* Muestra el contenido para copiarlo a mano cuando no se pudo guardar el archivo */
+function mostrarTextoParaCopiar(texto) {
+  UI.pestana = 'ajustes'; dibujar();
+  const caja = document.getElementById('bk');
+  if (caja) {
+    caja.value = texto; if (caja.select) caja.select();
+    const detalle = caja.closest && caja.closest('details'); if (detalle) detalle.open = true;
+  }
+  aviso('No se pudo guardar el archivo. Copiá el texto de la caja y guardalo en una nota o en Drive.');
+}
+
+/* Guarda un archivo. Devuelve true si se guardó o se mandó a algún lado, false si no. */
+async function descargar(nombre, texto) {
+  const plugins = window.Capacitor && window.Capacitor.Plugins;
+  if (CONFIG.apk && plugins && plugins.Filesystem && plugins.Share) {   // app Android: menú de compartir (Drive, etc.)
+    try {
+      const archivo = await plugins.Filesystem.writeFile({ path: nombre, data: texto, directory: 'CACHE', encoding: 'utf8' });
+      await plugins.Share.share({ title: nombre, url: archivo.uri, dialogTitle: 'Guardar o enviar ' + nombre });
+      return true;
+    } catch (e) {
+      if (/cancel/i.test(String((e && e.message) || e))) return false;   // la persona cerró el menú
+      mostrarTextoParaCopiar(texto); return false;
+    }
+  }
+  let servicio = null;
+  try { servicio = CONFIG.claude && window.claude ? await window.claude.use('downloads') : null; } catch (_) {}
+  if (servicio) {                                  // dentro de Claude
+    try { await servicio.save({ filename: nombre, data: texto }); return true; }
+    catch (e) { if (!e || e.code !== 'declined') aviso('No se pudo guardar el archivo.'); return false; }
+  }
+  if (!CONFIG.claude) try {                        // en un sitio normal (PWA)
+    const url = URL.createObjectURL(new Blob([texto], { type: 'text/plain;charset=utf-8' }));
+    const a = document.createElement('a'); a.href = url; a.download = nombre;
+    document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 3000);
+    return true;
+  } catch (_) {}
+  mostrarTextoParaCopiar(texto);
+  return false;
+}
+
+/* Guarda un archivo directo en la carpeta Documentos del teléfono (Documentos/MiPlata/).
+   Devuelve true si se guardó. Solo funciona en la app Android. */
+async function guardarEnDocumentos(nombre, datos, esBase64) {
+  const plugins = window.Capacitor && window.Capacitor.Plugins;
+  if (!(CONFIG.apk && plugins && plugins.Filesystem)) return false;
+  try {
+    const pedido = { path: 'MiPlata/' + nombre, data: datos, directory: 'DOCUMENTS', recursive: true };
+    if (!esBase64) pedido.encoding = 'utf8';
+    await plugins.Filesystem.writeFile(pedido);
+    return true;
+  } catch (_) { return false; }
+}
+
+/* Entrega un archivo binario (Excel, PDF): lo deja en Documentos/MiPlata y abre el menú de compartir */
+async function entregarArchivo(nombre, bytes, tipo) {
+  const plugins = window.Capacitor && window.Capacitor.Plugins;
+  if (CONFIG.apk && plugins && plugins.Filesystem) {
+    const base64 = aBase64(bytes);
+    const guardado = await guardarEnDocumentos(nombre, base64, true);
+    if (guardado) aviso('Guardado en Documentos/MiPlata/' + nombre);
+    if (plugins.Share) {
+      try {
+        const archivo = await plugins.Filesystem.writeFile({ path: nombre, data: base64, directory: 'CACHE' });
+        await plugins.Share.share({ title: nombre, url: archivo.uri, dialogTitle: 'Enviar ' + nombre });
+        return true;
+      } catch (_) {}
+    }
+    if (!guardado) aviso('No se pudo guardar el archivo.');
+    return guardado;
+  }
+  try {                                           // navegador
+    const url = URL.createObjectURL(new Blob([bytes], { type: tipo }));
+    const a = document.createElement('a'); a.href = url; a.download = nombre;
+    document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 3000);
+    return true;
+  } catch (_) { aviso('No se pudo guardar el archivo.'); return false; }
+}
+
+/* Recordatorio diario (notificación local de Android) */
+const RECORDATORIO_ID = 7001;
+async function programarRecordatorio(pedirPermiso) {
+  const plugins = window.Capacitor && window.Capacitor.Plugins, ln = plugins && plugins.LocalNotifications;
+  if (!(CONFIG.apk && ln)) return false;
+  try {
+    await ln.cancel({ notifications: [{ id: RECORDATORIO_ID }] });
+    if (!S.recOn) return true;
+    let permiso = await ln.checkPermissions();
+    if (permiso.display !== 'granted' && pedirPermiso) permiso = await ln.requestPermissions();
+    if (permiso.display !== 'granted') return 'permiso';
+    const [h, m] = (S.recHora || '21:00').split(':').map(Number);
+    await ln.schedule({ notifications: [{ id: RECORDATORIO_ID, title: 'Mi plata', body: '¿Ya anotaste tus gastos de hoy?',
+      schedule: { on: { hour: h, minute: m }, allowWhileIdle: true } }] });
+    return true;
+  } catch (_) { return false; }
+}
+
+/* =====================================================================
+   08 · PANTALLAS — arman el HTML de cada pestaña. Solo leen datos y
+   devuelven texto; los cambios los hacen las acciones (módulo 09).
+   ===================================================================== */
+const campoDinero = () => dineroOculto() ? 'password' : 'text';        // los montos se ven con puntos si están ocultos
+const filaDoble = (izquierda, derecha) => `<div class="row"><span>${izquierda}</span><b>${derecha}</b></div>`;
+const botonOjo = () => S.ocultar === true ? `<button class="x" data-a="mostrarOcultar">${etiquetaOjo()}</button>` : '';
+/* Copyright + autor en todas las pantallas */
+const pieCopyright = () =>
+  `<div class="copyright">© 2026 ${AUTOR}</div>`;
+const iconoWhatsApp = `<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style="vertical-align:-3px;margin-right:6px"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.435 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>`;
+
+/* ------------------------------ HOY ------------------------------ */
+function pantallaHoy(c) {
+  const hoy = hoyISO(), editado = S.spent.find(e => e.id === UI.editando);
+  const presupuesto = c.quedaHoy + c.gastoHoy;
+  const porcentaje = presupuesto > 0 ? Math.min(100, c.gastoHoy / presupuesto * 100) : 100;
+  const [clase, mensaje] = semaforo(c, S), nombre = nombreUsuario();
+  return [
+    `<div style="margin:4px 2px 12px"><div style="font-size:20px;font-weight:700">${saludoSegunHora(new Date().getHours())}${nombre ? ', ' + escapar(nombre) : ''}</div>` +
+      `<div class="mut">${fraseDeEstado(c, clase)}</div><div class="mut" style="margin-top:4px;font-style:italic">“${fraseDelDia(hoy)}”</div>` +
+      `<button class="sec" data-a="resumen" style="margin-top:8px;padding:8px 12px">Compartir resumen</button></div>`,
+    S.sueldo ? '' : '<div class="card mut">Primero cargá tu sueldo en Ajustes y revisá tus gastos importantes.</div>',
+    /* orden pensado para el uso diario: primero lo que se mira y lo que se hace todos los días */
+    tarjetaQuedaHoy(c, clase, mensaje, presupuesto, porcentaje),
+    tarjetaAnotarGasto(editado, hoy),          /* SIEMPRE justo debajo de "Te queda para hoy" */
+    tarjetaFondo(c),
+    tarjetaGastosAnotados(),
+    tarjetaRacha(),
+    tarjetaAvisoCopia(),
+    tarjetaSaldo(c),
+    tarjetaCuentas(c),
+    tarjetaRecalibrar(c),
+  ].join('');
+}
+
+/* Objetivo diario: elegís cuánto querés gastar por día y la app te muestra cuánto te sobra */
+function tarjetaObjetivo(c) {
+  const o = objetivoDiario(S, hoyISO());
+  const campo = `<div class="f"><input type="${campoDinero()}" inputmode="decimal" data-f="objetivo" placeholder="Ej: 10000" value="${S.objetivo || ''}">` +
+    '<button class="sec" data-a="usarBase">Usar el de la app</button></div>';
+  let cuerpo;
+  if (!o) {
+    cuerpo = '<div class="mut" style="margin-bottom:8px">Escribí cuánta plata querés gastar por día y apretá Enter: ese pasa a ser tu límite de cada día (el de "Te queda para hoy") y te digo cuánto te sobra para ahorrar.</div>' + campo;
+  } else {
+    const aplicado = !!(S.recal && S.recal.obj && S.recal.base === S.objetivo);
+    const alcanza = o.proyectado >= 0;
+    const mensaje = alcanza
+      ? `Si gastás <b>${dinero(o.obj)}</b> por día, al final del período te sobran <b class="num-ok">${dinero(o.proyectado)}</b> para ahorrar.`
+      : `Con <b>${dinero(o.obj)}</b> por día te faltarían <b class="neg">${dinero(-o.proyectado)}</b>. Tu plata alcanza para <b>${dinero(o.promedio)}</b> por día.`;
+    const hoyTxt = o.ahorroHoy >= 0
+      ? `Hoy vas <b>${dinero(o.ahorroHoy)}</b> por debajo de tu objetivo.`
+      : `Hoy te pasaste <b class="neg">${dinero(-o.ahorroHoy)}</b> de tu objetivo.`;
+    const antes = o.diasPrevios > 0
+      ? filaDoble('Ahorrado vs. objetivo (días anteriores)', `<span class="${o.ahorradoAntes < 0 ? 'neg' : ''}">${dinero(o.ahorradoAntes)}</span>`) : '';
+    const filas = o.escenarios.map(x =>
+      `<div class="row"><span>${x.actual ? '👉 ' : ''}Gastando ${dinero(x.o)} por día</span><b class="${x.sobra < 0 ? 'neg' : ''}">${x.sobra < 0 ? 'faltan ' + dinero(-x.sobra) : 'sobran ' + dinero(x.sobra)}</b></div>`).join('');
+    const sinAplicar = aplicado ? '' : '<div class="mut" style="margin:10px 0 0">Este número todavía <b>no</b> es tu límite oficial de hoy.</div>' +
+      '<div class="f" style="margin-top:8px"><button data-a="usarObjetivo">Usar como mi límite de hoy</button></div>';
+    cuerpo = campo + sinAplicar + `<div style="margin:10px 0">${mensaje}</div><div class="mut" style="margin-bottom:6px">${hoyTxt}</div>` +
+      filaDoble('Máximo parejo por día', dinero(o.promedio)) + filaDoble(`Días que faltan (con hoy)`, o.faltan) + antes +
+      '<div class="mut" style="margin:10px 0 4px">Probá distintos gastos por día:</div>' + filas +
+      '<div class="mut" style="font-size:13px;margin-top:8px">' + (aplicado ? 'Este objetivo es ahora tu límite diario oficial. Para volver a tu límite normal, borrá el número y apretá Enter. ' : '') + 'Lo que te sobre lo podés juntar en una meta (pestaña Plan).</div>';
+  }
+  return '<div class="card"><h2>🎯 Mi objetivo por día</h2>' + cuerpo + '</div>';
+}
+
+/* Racha en verde con puntitos de los últimos días */
+function tarjetaRacha() {
+  const r = rachaEnVerde(S, hoyISO());
+  if (!r.ultimos.length) return '';
+  const puntos = r.ultimos.map(ok => `<span style="display:inline-block;width:22px;height:22px;border-radius:50%;margin-right:6px;background:${ok ? 'var(--ok)' : 'var(--bad)'}"></span>`).join('');
+  const mensaje = r.racha === 0 ? 'Hoy podés empezar una racha: terminá el día sin pasarte.'
+    : r.racha >= 7 ? '¡Una semana entera o más en verde!' : r.racha >= 3 ? '¡Vas muy bien, no cortes la racha!' : 'Buen comienzo.';
+  return `<div class="card"><div style="font-weight:700">🔥 Racha en verde: ${r.racha} ${r.racha === 1 ? 'día' : 'días'}</div>` +
+    `<div style="margin:8px 0">${puntos}</div><div class="mut">${mensaje}</div></div>`;
+}
+
+/* Aviso en Hoy cuando hace días que no se guarda una copia (no aparece dentro de Claude, que ya sincroniza) */
+function tarjetaAvisoCopia() {
+  if (CONFIG.nube || S.demo) return '';
+  const e = estadoCopia(S, Date.now());
+  if (!e.avisar) return '';
+  const texto = e.dias === null ? 'Todavía no guardaste ninguna copia de tus datos.' : `Hace ${e.dias} días que no guardás una copia de tus datos.`;
+  return `<div class="card" style="border-color:var(--warn)"><div style="font-weight:600">☁️ ${texto}</div>` +
+    '<div class="mut" style="margin:4px 0 10px">Si cambiás de teléfono o lo formateás, sin copia se pierde todo.</div>' +
+    '<div class="f" style="margin:0"><button data-a="guardarNube">Guardar ahora</button>' + (CONFIG.apk ? '<button class="sec" data-a="guardarEnTelefono">📱 En el teléfono</button>' : '') + '<button class="sec" data-a="posponerCopia">Más tarde</button></div></div>';
+}
+
+const colorClase = clase => clase === 'neg' ? 'var(--bad)' : clase === 'warn' ? 'var(--warn)' : 'var(--ok)';
+function anillo(gastadoPct, clase) {
+  const resto = Math.max(0, Math.min(100, 100 - gastadoPct)), largo = 2 * Math.PI * 38;
+  return `<div class="anillo"><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="38" fill="none" stroke="var(--bd)" stroke-width="10"/>` +
+    `<circle cx="50" cy="50" r="38" fill="none" stroke="${colorClase(clase)}" stroke-width="10" stroke-linecap="round" stroke-dasharray="${(largo * resto / 100).toFixed(1)} ${largo.toFixed(1)}"/></svg><b>${Math.round(resto)}%</b></div>`;
+}
+function chipCategoria(cat) {
+  const k = CATEGORIAS_GASTO.findIndex(x => x[1] === cat);
+  return `<i class="kchip k${k < 0 ? 5 : k}">${k < 0 ? '💸' : CATEGORIAS_GASTO[k][0]}</i>`;
+}
+/* Una barra por día: verde = dentro del límite, rojo = te pasaste. La raya es la base por día. */
+function graficoDias(c) {
+  const dias = diasDelPeriodo(S, hoyISO()).filter(x => x.i <= c.hoyIdx);
+  if (dias.length < 2) return '';
+  const tope = Math.max(1, c.baseHoy, ...dias.map(x => x.gasto)) * 1.1, W = 300, H = 90, ancho = W / dias.length;
+  const barras = dias.map(x => { const h = Math.max(1, x.gasto / tope * H);
+    return `<rect x="${(x.i * ancho + ancho * 0.15).toFixed(1)}" y="${(H - h).toFixed(1)}" width="${(ancho * 0.7).toFixed(1)}" height="${h.toFixed(1)}" rx="3" fill="${x.gasto > x.presupuesto + 0.5 ? 'var(--bad)' : 'var(--ok)'}"/>`; }).join('');
+  const y = H - c.baseHoy / tope * H;
+  return '<div class="card"><h2>Mis días</h2>' + `<svg class="grafico" viewBox="0 0 ${W} ${H}">${barras}<line x1="0" x2="${W}" y1="${y.toFixed(1)}" y2="${y.toFixed(1)}" stroke="var(--mut)" stroke-dasharray="4 4"/></svg>` +
+    '<div class="mut" style="font-size:13px;margin-top:6px">Cada barra es un día: verde = dentro del límite, rojo = te pasaste. La raya es tu base por día.</div></div>';
+}
+function lineaFondo(c) {
+  const f = c.filas || [], pts = []; let acum = 0;
+  f.slice(0, c.hoyIdx).forEach(x => { acum += x.aporte; pts.push(acum); });
+  if (pts.length < 2) return '';
+  const min = Math.min(0, ...pts), max = Math.max(1, ...pts), W = 300, H = 50;
+  const p = pts.map((v, k) => `${(k / (pts.length - 1) * W).toFixed(1)},${(H - (v - min) / (max - min) * (H - 6) - 3).toFixed(1)}`).join(' ');
+  return `<svg class="grafico" viewBox="0 0 ${W} ${H}" style="margin-top:8px"><polyline points="${p}" fill="none" stroke="var(--ok)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+}
+
+/* Etiqueta chica y discreta con la tasa, como la de Mercado Pago ("↑ Rinde 19%"). Es solo la tasa que cargaste vos en Ajustes. */
+function etiquetaRinde(activo) {
+  const t = Math.min(300, Math.max(0, +S.rendTasa || 0));
+  if (!activo || !t) return '';
+  return `<div style="color:var(--ok);font-size:0.8125rem;font-weight:600;margin:2px 0 6px">↑ Rinde ${String(t).replace('.', ',')}%</div>`;
+}
+
+function tarjetaQuedaHoy(c, clase, mensaje, presupuesto, porcentaje) {
+  return `<div class="card hero-card"><div class="mut">Te queda para hoy</div><div class="hero-fila"><div class="num ${clase}" style="margin:0;font-size:2.5rem">${pesosConCentavos(c.quedaHoy)}</div>${anillo(porcentaje, clase)}</div>` +
+    etiquetaRinde(S.rendDispOn) +
+    `<div class="bar ${clase}"><i style="width:${porcentaje}%"></i></div>` +
+    `<div class="mut">Presupuesto de hoy ${pesos(presupuesto)}. Gastaste ${pesos(c.gastoHoy)}.</div>` +
+    (c.fondo.activo ? `<div class="mut" style="margin-top:4px">Lo que no gastes hoy va a tu fondo: <b class="${c.fondo.hoySuma < 0 ? 'neg' : ''}">${pesosConCentavos(c.fondo.hoySuma)}</b></div>` : '') +
+    (c.manana != null ? `<div id="linea-manana" style="margin-top:8px">Mañana tendrás <b class="${c.manana < 0 ? 'neg' : ''}">${pesosConCentavos(c.manana)}</b></div>` : '') +
+    (mensaje ? `<div class="${clase}" style="font-weight:600;margin-top:6px">${mensaje}</div>` : '') + '</div>';
+}
+
+/* Fondo de ahorro: se ve siempre en Hoy, sin tener que ir a otra pestaña */
+function tarjetaFondo(c) {
+  const f = c.fondo;
+  if (!f.activo) return '';
+  const usos = S.fondoUsos || [];
+  const retirado = f.acumulado - f.total;
+  const detalle = [
+    'Este período: <b>' + dinero(f.ahorroPeriodo) + '</b>',
+    f.fondoPrev ? 'De antes: <b>' + dinero(f.fondoPrev) + '</b>' : '',
+    retirado > 0 ? 'Retiraste: <b>' + dinero(retirado) + '</b>' : '',
+  ].filter(Boolean).join(' · ');
+  const formulario = UI.usandoFondo
+    ? '<div style="margin-top:10px;padding:12px;border:1px solid var(--ac);border-radius:10px"><label>¿Cuánto sacás del fondo?</label>' +
+      `<input id="fu" inputmode="decimal" placeholder="Monto"><label>¿Para qué?</label><input id="fn" placeholder="Detalle (opcional)">` +
+      '<label>¿Qué hacés con esa plata?</label><select id="fp"><option value="hoy">La voy a gastar hoy (suma a mi límite de hoy)</option><option value="cubre">Cubre gastos que ya hice / cuadrar con el banco (no suma a hoy)</option></select>' +
+      '<div class="f" style="margin:10px 0 0"><button class="sec" data-a="cancelarUsoFondo">Cancelar</button><button data-a="confirmarUsoFondo">Sacar</button></div></div>'
+    : '<div class="f" style="margin-top:8px"><button class="sec" data-a="usarFondo">Usar del fondo</button></div>';
+  const lista = usos.length
+    ? '<div style="margin-top:8px">' + usos.map((x, k) => `<div class="row"><span>${diaYMes(x.date)} ${escapar(x.note || 'Uso del fondo')}${x.para !== 'cubre' ? ' (para hoy)' : ''}</span><span><b>${dinero(-x.amt)}</b><button class="x" data-a="quitarUsoFondo" data-i="${k}">✕</button></span></div>`).join('') + '</div>'
+    : '';
+  return `<div class="card"><div class="mut">Mi fondo de ahorro ${botonOjo()}</div><div class="num">${dinero(f.totalConRend)}</div>` + etiquetaRinde(S.rendOn) +
+    `<div class="mut">${detalle}</div>` +
+    (f.rend > 0.005 ? `<div class="mut" style="margin-top:4px">Incluye rendimiento estimado: <b>${dinero(f.rend)}</b></div>` : '') + lineaFondo(c) + formulario + lista + '</div>';
+}
+
+function tarjetaSaldo(c) {
+  const cambia = c.baseManana != null && Math.abs(c.baseManana - c.baseHoy) >= 1;
+  return '<div class="card">' +
+    filaDoble(`Saldo del período ${botonOjo()}`, dinero(c.saldo)) +
+    (c.rendDisp > 0.005 ? filaDoble('Incluye rendimiento estimado', dinero(c.rendDisp)) : '') +
+    filaDoble('Días que faltan (con hoy)', c.faltan) +
+    filaDoble(`Base por día${c.recal ? ' (recalibrada)' : ''}`, pesos(c.baseHoy)) +
+    (cambia ? filaDoble('Base por día desde mañana', pesos(c.baseManana)) : '') + '</div>';
+}
+
+function tarjetaCuentas(c) {
+  const cuentas = cuentasDe(), cc = conciliar(S, c);
+  const filas = cuentas.map((x, k) =>
+    `<div class="f"><input type="checkbox" data-f="cuentaCuenta" data-k="${k}" ${x.x ? '' : 'checked'}>` +
+    `<input data-f="cuentaNombre" data-k="${k}" value="${escapar(x.n)}" placeholder="Cuenta">` +
+    `<input type="${campoDinero()}" inputmode="decimal" data-f="cuentaSaldo" data-k="${k}" value="${x.m || ''}" placeholder="Saldo" style="max-width:120px">` +
+    `<button class="x" data-a="quitarCuenta" data-i="${k}">✕</button></div>`).join('');
+  const comparacion = cc.hayCuentas
+    ? filaDoble('Total en cuentas', dinero(cc.total)) +
+      filaDoble('Diferencia con la app', `<span class="${Math.abs(cc.diferencia) < 1 ? '' : 'warn'}">${dineroOculto() ? '••••••' : pesos(cc.diferencia)}</span>`)
+    : '<div class="mut" style="margin:8px 0">Cargá el saldo de al menos una cuenta para compararlo con la app.</div>';
+  const pendiente = UI.ajustePendiente == null ? '' :
+    `<div style="margin-top:10px;padding:12px;border:1px solid var(--ac);border-radius:10px"><div style="margin-bottom:10px">El saldo previo cambia en <b>${pesos(UI.ajustePendiente)}</b>. ¿Seguir?</div>` +
+    '<div class="f" style="margin:0"><button class="sec" data-a="ajusteNo">Cancelar</button><button data-a="ajusteSi">Aceptar</button></div></div>';
+  const recomposiciones = (S.ajustes || []).length
+    ? '<div style="margin-top:10px"><div class="mut">Recomposiciones (se reparten desde mañana entre los días que faltan)</div>' +
+      S.ajustes.map((x, i) => `<div class="row"><span>${diaYMes(x.date)} ${escapar(x.note)}</span><span><b>${dineroOculto() ? '••••' : pesos(x.amt)}</b>` +
+        `<button class="x" data-a="quitarRecomposicion" data-i="${i}">✕</button></span></div>`).join('') + '</div>'
+    : '';
+  const resumenFondo = c.fondo.activo
+    ? '<div style="margin:8px 0">' + filaDoble('Disponible para gastar', dinero(c.fondo.disponible)) +
+      filaDoble('Fondo de ahorro', dinero(c.fondo.total + (c.fondo.rendEnMP ? c.fondo.rend : 0))) +
+      filaDoble('Total (lo que tendrías en cuentas)', dinero(c.fondo.disponible + c.fondo.total + (c.fondo.rendEnMP ? c.fondo.rend : 0))) + '</div>'
+    : '';
+  return '<div class="card"><h2>Mis cuentas</h2>' + filas + resumenFondo + comparacion +
+    '<div class="f" style="margin-top:8px;flex-wrap:wrap"><button class="sec" data-a="agregarCuenta">Agregar cuenta</button>' +
+    (cc.hayCuentas ? '<button data-a="ajustarCuentas">Ajustar con las cuentas</button>' : '') + '</div>' + pendiente + recomposiciones +
+    '<div class="mut" style="font-size:13px;margin-top:6px">Las cuentas tildadas cuentan. Lo que apartaste para tus metas se considera dentro de ellas. Destildá, por ejemplo, la plata de reservas.</div></div>';
+}
+
+function tarjetaAnotarGasto(editado, hoy) {
+  const b = UI.borrador;      // lo que ya se escribió pero todavía no se anotó
+  const monto = b.amt !== undefined ? b.amt : (editado ? editado.amt : '');
+  const detalle = b.note !== undefined ? b.note : (editado ? (editado.note || '') : '');
+  const fecha = b.date !== undefined ? b.date : (editado ? editado.date : hoy);
+  const categorias = '<div class="f" style="flex-wrap:wrap;gap:6px">' + CATEGORIAS_GASTO.map(([emoji, nombre]) =>
+    `<button class="chip${UI.categoria === nombre ? ' on' : ''}" data-a="categoria" data-v="${nombre}">${emoji} ${nombre}</button>`).join('') + '</div>';
+  const atajos = editado ? '' :
+    '<div class="f"><button class="sec" data-a="dictar">🎤 Dictar</button>' +
+    (CONFIG.claude ? '<label class="bt">📷 Foto de ticket<input id="ph" type="file" accept="image/*" capture="environment" hidden></label>' : '') + '</div>';
+  return `<div class="card" id="tarjeta-anotar"><h2>${editado ? 'Editar gasto' : 'Anotar gasto'}</h2>` +
+    `<div class="f"><input id="am" inputmode="decimal" placeholder="Monto" value="${escapar(monto)}"><input id="nt" placeholder="Detalle" value="${escapar(detalle)}"></div>` +
+    categorias + atajos +
+    `<div class="f"><input id="dt" type="date" value="${fecha}"></div>` +
+    `<button data-a="anotar" style="width:100%">${editado ? 'Guardar cambios' : 'Anotar gasto'}</button>` +
+    (editado ? '<button class="sec" data-a="cancelarEdicion" style="width:100%;margin-top:8px">Cancelar</button>' : '') + '</div>';
+}
+
+function tarjetaRecalibrar(c) {
+  return '<div class="card"><h2>Recalibrar</h2><div class="mut" style="margin-bottom:10px">Si tuviste un gasto grande, reparte lo que te queda entre los días que faltan.</div>' +
+    '<div class="f"><button class="sec" data-a="recalibrar">Recalibrar desde hoy</button>' +
+    (c.recal ? '<button class="sec" data-a="quitarRecalibracion">Quitar</button>' : '') + '</div></div>';
+}
+
+function tarjetaGastosAnotados() {
+  const todos = [...S.spent].sort((a, b) => b.date.localeCompare(a.date) || b.id - a.id);
+  const lista = UI.verTodos ? todos.slice(0, 60) : todos.slice(0, 5);     // en Hoy se ven los últimos 5
+  const fila = e => `<div class="row"><span style="display:flex;align-items:center">${chipCategoria(e.cat)}<span>${escapar(e.note || e.cat || 'Gasto')}<br><small class="mut">${diaYMes(e.date)}</small></span></span><span><b>${pesos(e.amt)}</b>` +
+    `<button class="x" data-a="editar" data-i="${e.id}">✎</button><button class="x" data-a="borrar" data-i="${e.id}">✕</button></span></div>`;
+  return '<div class="card"><h2>Gastos anotados</h2>' + (lista.length ? lista.map(fila).join('') : '<div class="mut">Todavía no anotaste gastos.</div>') +
+    (todos.length > 5 ? `<button class="sec" data-a="verTodos" style="width:100%;margin-top:10px">${UI.verTodos ? 'Ver solo los últimos 5' : 'Ver todos (' + todos.length + ')'}</button>` : '') + '</div>';
+}
+
+/* ------------------------------ DÍAS ------------------------------ */
+/* Convierte una tarjeta en una celda desplegable: cerrada muestra título y resumen; abierta, el contenido */
+function plegable(id, tarjeta, resumen) {
+  const m = tarjeta.match(/^<div class="card">(?:<h2>([\s\S]*?)<\/h2>)?([\s\S]*)<\/div>$/);
+  if (!m) return tarjeta;
+  const abierto = !!UI.abiertos[id];
+  return '<div class="card"><button class="plegar" data-a="plegar" data-s="' + id + '">' + (m[1] || '') +
+    (resumen ? ' · ' + resumen : '') + (abierto ? '  ▴' : '  ▾') + '</button>' +
+    (abierto ? '<div class="plegado">' + m[2] + '</div>' : '') + '</div>';
+}
+
+function pantallaDias(c) {
+  const hoy = hoyISO();
+  const filas = diasDelPeriodo(S, hoy).map(x => {
+    const pasado = x.i <= c.hoyIdx || x.gasto;
+    return `<div class="tb${x.i === c.hoyIdx ? ' td' : ''}" data-d="${x.iso}"><span>${estaCerrado(S, x.iso) ? '🔒' : ''}${x.dia.slice(0, 3)} ${diaYMes(x.iso)}</span>` +
+      `<span>${pesos(x.presupuesto)}</span><span>${x.gasto ? pesos(x.gasto) : ''}</span>` +
+      `<span class="${pasado && x.sobra < 0 ? 'neg' : ''}">${pasado ? pesos(x.sobra) : ''}</span></div>`;
+  }).join('');
+  return tarjetaObjetivo(c) + graficoDias(c) + plegable('dias', '<div class="card"><h2>Día por día</h2><div class="mut" style="margin:-4px 0 8px">Tocá un día para ver sus gastos.</div>' +
+    '<div class="tb mut"><span>Día</span><span>Presupuesto</span><span>Gasto</span><span>Sobrante</span></div>' + filas +
+    '<div style="margin-top:8px">' + filaDoble('Total gastado', pesos(suma(S.spent.filter(e => !e.meta), e => e.amt))) +
+    filaDoble(`Queda del monto disponible ${botonOjo()}`, dinero(c.saldo)) +
+    (c.fondo.activo ? filaDoble('Ahorrado en el fondo este período', dinero(c.fondo.ahorroPeriodo)) : '') + '</div></div>', 'día ' + (c.hoyIdx + 1) + ' de ' + c.dias);
+}
+
+function ventanaDia(iso) {
+  const gastos = S.spent.filter(e => e.date === iso).sort((a, b) => a.id - b.id);
+  const cierre = (S.cierres || {})[iso], dia = diasDelPeriodo(S, hoyISO()).find(x => x.iso === iso);
+  const total = suma(gastos.filter(e => !e.meta), e => e.amt);
+  const m = crearModal(
+    `<div class="row" style="border:0"><b style="font-size:17px">${dia ? dia.dia : ''} ${diaYMes(iso)}</b><button class="x" id="dx">✕</button></div>` +
+    (dia ? `<div class="mut" style="margin-bottom:6px">Presupuesto del día ${pesos(dia.presupuesto)}</div>` : '') +
+    (cierre ? `<div class="mut" style="margin-bottom:6px">🔒 Cerrado: gastado ${pesos(cierre.g)}, sobrante ${pesos(cierre.l)}${Math.abs(cierre.g - total) > 0.5 ? ' <b class="neg">· cambió después del cierre</b>' : ''}</div>` : '') +
+    (gastos.length
+      ? gastos.map(e => `<div class="row"><span>${emojiCategoria(e.cat)}${escapar(e.note || e.cat || 'Sin detalle')}</span><span><b>${pesos(e.amt)}</b><button class="x" data-ed="${e.id}">✎</button></span></div>`).join('') + filaDoble('Total del día', pesos(total))
+      : '<div class="mut" style="margin:10px 0">No hay gastos anotados este día.</div>'),
+    380, 20, 'max-height:80vh;overflow:auto');
+  m.onclick = ev => {
+    const id = ev.target.dataset.ed;
+    if (ev.target === m || ev.target.id === 'dx') m.remove();
+    if (id) { m.remove(); UI.editando = +id; UI.pestana = 'hoy'; dibujar(); scrollTo(0, 0); }
+  };
+}
+
+/* ------------------------------ PLAN: ingresos, gastos importantes, cuotas y metas ------------------------------ */
+function pantallaPlan(c) {
+  const resumen = '<div class="card"><h2>Resumen del mes</h2>' + filaDoble('Total de ingresos', dinero(totalIngresos(S))) +
+    filaDoble('Total gastos importantes', pesos(c.total)) + filaDoble('Todavía por pagar', pesos(c.porPagar)) +
+    filaDoble(`Disponible del mes ${botonOjo()}`, dinero(c.disp)) + filaDoble(`Base por día (${c.dias} días)`, pesos(c.base)) + '</div>';
+  const nGastos = S.items.filter(i => i.n || i.a).length, nProx = gastosQueSeRepiten(S).length + (S.proximos || []).length, nCuotas = resumenCuotas(S).length;
+  const cuenta = (n, uno, varios) => n + ' ' + (n === 1 ? uno : varios);
+  return tarjetaIngresos(false) +
+    plegable('gastos', tarjetaGastosImportantes(), cuenta(nGastos, 'gasto', 'gastos')) +
+    plegable('proximo', tarjetaProximos(), cuenta(nProx, 'gasto', 'gastos')) +
+    plegable('cuotas', tarjetaCuotas(), nCuotas ? cuenta(nCuotas, 'en curso', 'en curso') : '') +
+    resumen + plegable('metas', tarjetaMetas(), (S.metas || []).length ? cuenta((S.metas || []).length, 'meta', 'metas') : '');
+}
+
+function tarjetaIngresos(intro) {
+  const tipo = intro ? 'text' : campoDinero();
+  const opciones = x => (CATEGORIAS_INGRESO.includes(x.cat) ? CATEGORIAS_INGRESO : CATEGORIAS_INGRESO.concat(x.cat))
+    .map(cat => `<option${cat === x.cat ? ' selected' : ''}>${escapar(cat)}</option>`).join('');
+  const filas = (S.ingresos || []).map((x, k) =>
+    `<div class="f"><select data-f="ingresoCategoria" data-k="${k}">${opciones(x)}</select>` +
+    `<input type="${tipo}" inputmode="decimal" data-f="ingresoMonto" data-k="${k}" value="${x.a || ''}" placeholder="Monto" style="max-width:130px">` +
+    `<button class="x" data-a="quitarIngreso" data-i="${k}">✕</button></div>`).join('');
+  return '<div class="card">' + (intro ? '' : '<h2>💵 Ingresos</h2><div class="mut" style="margin-bottom:8px">De dónde viene tu plata cada mes.</div>') + filas +
+    '<button class="sec" data-a="agregarIngreso">Agregar ingreso</button><div style="margin-top:10px">' +
+    filaDoble('Total de ingresos', intro ? pesos(totalIngresos(S)) : dinero(totalIngresos(S))) + '</div></div>';
+}
+
+function tarjetaGastosImportantes() {
+  const lista = S.items.map((i, k) =>
+    `<div class="f">` +
+    `<input data-f="itemNombre" data-k="${k}" value="${escapar(i.n)}" placeholder="Nombre">` +
+    `<input data-f="itemMonto" data-k="${k}" inputmode="decimal" value="${i.a || ''}" placeholder="Monto" style="max-width:110px">` +
+    `<button class="x" data-a="quitarGasto" data-i="${k}">✕</button></div>` +
+    `<div style="margin:-2px 0 6px 4px"><button class="sec" data-a="alternarPagado" data-i="${k}" style="padding:4px 14px;font-size:14px;border-radius:999px;color:var(${i.p ? '--ok' : '--warn'});border-color:var(${i.p ? '--ok' : '--warn'})">${i.p ? '✅ Pagado' : '⏳ Impago'}</button></div>` +
+    (i.d ? `<div class="mut" style="font-size:12px;margin:-4px 0 8px 32px">Se descuenta desde el ${diaYMes(i.d)}</div>` : '') +
+    (i.x || []).map(x => `<div class="mut" style="font-size:12px;margin:-4px 0 8px 32px">Aumento de ${dineroOculto() ? '••••' : pesos(x.amt)} desde el ${diaYMes(x.desde)}</div>`).join('') +
+    ((i.n || i.a) && !tieneCuotas(i) ? `<div class="f" style="margin:-4px 0 6px 32px;flex-wrap:wrap;gap:4px 14px">` +
+      `<label class="mut" style="margin:0;font-size:13px;display:flex;align-items:center;gap:6px"><input type="checkbox" data-f="itemRepite" data-k="${k}" ${i.f !== false ? 'checked' : ''}>🔁 Repetir el mes que viene</label>` +
+      (i.f !== false ? `<label class="mut" style="margin:0;font-size:13px;display:flex;align-items:center;gap:6px"><input type="checkbox" data-f="itemVariable" data-k="${k}" ${i.v ? 'checked' : ''}>✏️ El monto cambia (queda vacío)</label>` : '') +
+      `</div>` : '') + lineaDeCuotas(i, k)).join('');
+  return '<div class="card"><h2>🧾 Pagar al cobrar</h2><div class="mut" style="margin-bottom:8px">Lo primero que se paga cuando cobrás. Tildá 🔁 en los fijos de todos los meses; si el monto cambia (luz, gas), tildá también ✏️ y el mes que viene aparecen con el monto vacío.</div>' + lista +
+    '<button class="sec" data-a="agregarGasto">Agregar gasto</button></div>';
+}
+
+/* Gastos del próximo período: se anotan ahora pero NO descuentan nada de este; al empezar el período nuevo pasan a "Pagar al cobrar" */
+/* Gastos de este período que pasan solos al siguiente: los marcados con 🔁 y las cuotas que todavía no terminaron */
+function gastosQueSeRepiten(S) {
+  return S.items.map((i, k) => ({ i, k }))
+    .filter(({ i }) => (i.n || i.a) && (tieneCuotas(i) ? i.q.actual < i.q.total : i.f !== false))
+    .map(({ i, k }) => {
+      const variable = !!i.v && !tieneCuotas(i);
+      const prox = (i.prox != null && i.prox !== '') ? +i.prox : null;   // monto cargado para el período que viene
+      return { k, n: i.n || 'Sin nombre', variable, prox, a: prox != null ? prox : (variable ? null : montoDe(i)),
+        cuota: tieneCuotas(i) ? (i.q.actual + 1) + '/' + i.q.total : '' };
+    });
+}
+
+function tarjetaProximos() {
+  const l = S.proximos || [], rep = gastosQueSeRepiten(S);
+  const repHtml = rep.length ? '<div class="mut" style="margin:6px 0 4px">🔁 Se repiten solos</div>' +
+    rep.map(x => `<div class="f" style="align-items:center"><span style="flex:1;min-width:0">${escapar(x.n)}${x.cuota ? ' · cuota ' + x.cuota : ''}</span>` +
+      `<input data-f="itemProx" data-k="${x.k}" inputmode="decimal" value="${x.prox != null ? x.prox : (x.variable ? '' : x.a)}" placeholder="Monto a definir" style="max-width:130px;text-align:right"></div>`).join('') : '';
+  const lista = l.map((x, k) =>
+    `<div class="f"><input data-f="proxNombre" data-k="${k}" value="${escapar(x.n)}" placeholder="Nombre">` +
+    `<input data-f="proxMonto" data-k="${k}" inputmode="decimal" value="${x.a || ''}" placeholder="Monto" style="max-width:110px">` +
+    `<button class="x" data-a="quitarProximo" data-i="${k}">✕</button></div>`).join('');
+  return '<div class="card"><h2>🗓️ Para el próximo período</h2><div class="mut" style="margin-bottom:8px">Acá ves lo que ya tenés comprometido para cuando cobres. Los marcados con 🔁 aparecen solos y, cuando te llegue el importe (por ejemplo el de Telecom), lo escribís en su cuadrito. Los demás los anotás vos. No descuentan nada de este período.</div>' + repHtml +
+    (l.length ? '<div class="mut" style="margin:10px 0 4px">✍️ Anotados por vos</div>' : '') + lista +
+    `<div style="margin:8px 0">${filaDoble('Ya reservado para el próximo', pesos(suma(rep, x => x.a || 0) + suma(l, x => +x.a || 0)))}</div>` +
+    '<button class="sec" data-a="agregarProximo">Agregar gasto del próximo período</button></div>';
+}
+
+/* Debajo de cada gasto: o los datos de la cuota (5 de 12) o el botón para marcarlo en cuotas */
+function lineaDeCuotas(i, k) {
+  if (tieneCuotas(i))
+    return `<div class="f" style="margin:-4px 0 10px 32px;flex-wrap:wrap"><span class="mut">Cuota</span>` +
+      `<input data-f="cuotaActual" data-k="${k}" inputmode="numeric" value="${i.q.actual}" style="max-width:64px"><span class="mut">de</span>` +
+      `<input data-f="cuotaTotal" data-k="${k}" inputmode="numeric" value="${i.q.total}" style="max-width:64px">` +
+      `<button class="x" data-a="quitarCuotas" data-i="${k}">Pago único</button></div>`;
+  return (i.n || i.a) ? `<div style="margin:-4px 0 6px 32px"><button class="x" data-a="ponerCuotas" data-i="${k}" style="padding:2px 6px;font-size:13px">+ Es en cuotas</button></div>` : '';
+}
+
+function tarjetaCuotas() {
+  const cuotas = resumenCuotas(S);
+  if (!cuotas.length) return '<div class="card"><h2>📆 Cuotas</h2><div class="mut">Si un gasto se paga en cuotas, por ejemplo la tarjeta, tocá "+ Es en cuotas" debajo de ese gasto y poné en cuál vas (5 de 12). Al empezar cada período, la app pasa a la cuota siguiente.</div></div>';
+  return '<div class="card"><h2>📆 Cuotas en curso</h2>' +
+    cuotas.map(q => filaDoble(`${escapar(q.n || 'Sin nombre')} · cuota ${q.actual}/${q.total}`, q.restantes ? `faltan ${q.restantes} (${pesos(q.restoTotal)})` : '¡última cuota!')).join('') +
+    '<div style="margin-top:6px">' + filaDoble('Falta pagar en cuotas (sin la de este mes)', pesos(suma(cuotas, q => q.restoTotal))) + '</div></div>';
+}
+
+/* ------------------------------ INTRODUCCIÓN (primera vez) ------------------------------ */
+/* Barra de avance de la introducción: 6 pantallas (la bienvenida es la primera) */
+function progresoIntro(n) {
+  const puntos = [0, 1, 2, 3, 4, 5].map(i => `<span class="${i < n ? 'hecho' : i === n ? 'actual' : ''}"></span>`).join('');
+  return `<div class="progreso"><div class="puntos">${puntos}</div><div class="mut">Paso ${n + 1} de 6</div></div>`;
+}
+function pantallaBienvenida() { return (UI.paso >= 1 ? progresoIntro(UI.paso) : '') + contenidoBienvenida(); }
+
+function contenidoBienvenida() {
+  const c = calcular(S, hoyISO()), nombre = nombreUsuario(), paso = UI.paso;
+  const pie = (conAtras, texto) => '<div class="pie">' + (conAtras ? '<button class="sec" data-a="pasoAtras">← Atrás</button>' : '<span></span>') +
+    `<button data-a="pasoSiguiente">${texto}</button></div>`;
+  const titulo = (grande, chico) => `<div style="margin:6px 2px 16px"><div class="serif" style="font-size:28px;font-weight:800;line-height:1.15">${grande}</div><div class="mut" style="margin-top:6px">${chico}</div></div>`;
+
+  /* 0 · Bienvenida: una pantalla aparte, solo para dar la bienvenida */
+  if (paso === 0)
+    return `<div class="hero"><div class="moneda">💰</div><div class="serif hero-t">Bienvenido${nombre ? ',<br>' + escapar(nombre) : ''}</div>` +
+      '<div class="serif hero-s">a Mi plata</div><p class="hero-p">Ordená tu plata, un día a la vez.</p>' +
+      `<input data-f="nombre" value="${escapar(nombre)}" placeholder="¿Cómo te llamás? (opcional)"${S.demo ? ' readonly autocomplete="off"' : ''} style="max-width:320px;text-align:center">` +
+      (S.demo ? '' : '<div class="importar"><div class="importar-fila"><span class="importar-icono">📥</span><span class="importar-txt"><b>¿Ya usabas Mi plata?</b><span>Traé tus datos desde una copia de seguridad.</span></span></div>' +
+      '<button class="sec" data-a="recuperarNube" style="width:100%;margin-top:12px;background:var(--card)">Importar copia de seguridad</button>' +
+      '<input id="fi" type="file" accept=".json,.txt,application/json,text/plain" style="display:none"></div>') +
+      pieCopyright() + '</div>' + pie(false, S.demo ? 'Continuar →' : 'Comenzar →');
+
+  /* 1 · Cómo funciona, con un ejemplo con números */
+  if (paso === 1)
+    return titulo('Así funciona', 'Tres pasos y listo.') + '<div class="card">' +
+      [['1', 'Cargás lo que cobrás.'], ['2', 'Anotás lo que pagás sí o sí: alquiler, servicios, tarjetas.'], ['3', 'Lo que sobra se divide entre los días del mes.']]
+        .map(([n, t]) => `<div class="f" style="align-items:flex-start"><span class="paso">${n}</span><span>${t}</span></div>`).join('') + '</div>' +
+      '<div class="card"><div class="mut" style="margin-bottom:6px">Un ejemplo</div>' + filaDoble('Cobrás', pesos(1000000)) + filaDoble('Pagás sí o sí', '− ' + pesos(400000)) +
+      filaDoble('Te quedan para 30 días', pesos(600000)) + `<div class="resultado">${pesos(20000)}<span> por día</span></div></div>` +
+      '<div class="mut">Si hoy gastás menos, <b>lo que sobra pasa a mañana</b>. Si te pasás, mañana tenés un poco menos.</div>' +
+      '<div class="mut" style="margin-top:10px;font-size:13px">Además: metas de ahorro, cuotas, PIN, copias de seguridad y un resumen para compartir.</div>' +
+      pieCopyright() + pie(true, 'Siguiente →');
+
+  /* 2 · Confianza: qué pasa con los datos */
+  if (paso === 2) {
+    const puntos = CONFIG.nube
+      ? ['Sin anuncios.', 'Tus datos se guardan en tu cuenta de Claude: nadie más los ve.', 'Podés ponerle PIN a la app.', 'Podés guardar una copia cuando quieras.']
+      : ['Sin cuenta ni registro.', 'Sin anuncios.', 'Tus números se guardan en tu teléfono y solo salen si vos guardás una copia.',
+         'No pide acceso a tus contactos, ubicación ni cámara. El micrófono solo se usa si tocás Dictar.', 'Podés ponerle PIN para que nadie vea tus números.', 'Las copias las guardás vos, en tu Drive.'];
+    return titulo('Tu plata, tu decisión', 'Lo que tenés que saber antes de empezar.') + '<div class="card">' +
+      puntos.map(t => `<div class="f" style="align-items:flex-start"><span style="color:var(--ok);font-weight:700">✓</span><span>${t}</span></div>`).join('') + '</div>' +
+      (CONFIG.apk ? '<div class="mut" style="font-size:13px">Podés comprobar los permisos en Ajustes de Android → Apps → Mi plata → Permisos.</div>' : '') +
+      pieCopyright() + pie(true, 'Siguiente →');
+  }
+
+  /* 3 · Hoja en blanco para los ingresos */
+  if (paso === 3)
+    return titulo('¿De dónde viene tu plata?', 'Elegí la categoría de cada ingreso y escribí cuánto es.') + tarjetaIngresos(true) +
+      `<div class="card"><h2>📅 ¿Cuándo cobrás?</h2><label style="margin-top:0">Día que cobrás (inicio del mes)</label><input type="date" data-f="inicio" value="${S.start}">` +
+      `<label>Próximo cobro (fin)</label><input type="date" data-f="fin" value="${S.end}"></div>` +
+      pieCopyright() + pie(true, 'Siguiente →');
+
+  /* 4 · Gastos importantes */
+  if (paso === 4)
+    return titulo('Tus gastos importantes', 'Lo primero que pagás al cobrar: alquiler, servicios, tarjetas, cuotas.') +
+      tarjetaGastosImportantes() + tarjetaCuotas() +
+      `<div class="card"><label style="margin-top:0">Saldo previo en cuenta (opcional)</label><input data-f="previo" inputmode="decimal" value="${S.previo || ''}" placeholder="Lo que te quedó del mes anterior"></div>` +
+      '<div class="card"><h2>Así queda tu mes</h2>' + filaDoble('Ingresos', pesos(totalIngresos(S))) + filaDoble('Gastos importantes', pesos(c.total)) +
+      filaDoble('Te queda para el día a día', pesos(c.disp)) + '</div>' +
+      pieCopyright() + pie(true, 'Siguiente →');
+
+  /* 5 · Listo: el resultado, en grande */
+  const porDia = c.dias ? c.disp / c.dias : 0;
+  return `<div class="hero"><div class="moneda">🎉</div><div class="serif" style="font-size:30px;font-weight:800;line-height:1.15;margin-top:10px">Listo${nombre ? ', ' + escapar(nombre) : ''}.<br>Tu plan está armado.</div>` +
+    (porDia > 0
+      ? `<div class="mut" style="margin-top:26px">Podés gastar unos</div><div class="grande">${pesos(porDia)}</div><div class="mut">por día durante ${c.dias} días</div>` +
+        '<p class="hero-p" style="margin-top:18px">Lo que no gastes hoy, pasa a mañana.</p>'
+      : '<p class="hero-p" style="margin-top:18px">Tus gastos importantes superan lo que cobrás. Volvé atrás y revisá los montos.</p>') +
+    pieCopyright() + '</div>' + pie(true, 'Empezar →');
+}
+
+function tarjetaMetas() {
+  const hoy = hoyISO();
+  const metas = metasDe().map((m, k) => {
+    const juntado = juntadoEnMeta(S, m), pct = m.t > 0 ? Math.min(100, juntado / m.t * 100) : 0;
+    const sugerido = aporteMensualSugerido(S, m, hoy);
+    return `<div style="margin-bottom:18px"><div class="f"><input data-f="metaNombre" data-k="${k}" value="${escapar(m.n)}" placeholder="Nombre de la meta"><button class="x" data-a="quitarMeta" data-i="${k}">✕</button></div>` +
+      `<div class="bar"><i style="width:${pct}%"></i></div><div class="mut" style="font-size:16px">Juntado <b>${pesos(juntado)}</b> de <b>${pesos(m.t)}</b> (${Math.round(pct)}%)</div>` +
+      `<div class="mut">Falta <b>${pesos(Math.max(0, m.t - juntado))}</b></div>` +
+      `<label>Cuánto necesitás juntar</label><input inputmode="decimal" data-f="metaObjetivo" data-k="${k}" value="${m.t || ''}">` +
+      `<label>Ya juntado antes</label><input inputmode="decimal" data-f="metaPrevio" data-k="${k}" value="${m.g0 || ''}">` +
+      `<label>Fecha objetivo (opcional)</label><input type="date" data-f="metaFecha" data-k="${k}" value="${m.f || ''}">` +
+      `<div class="mut" style="margin:8px 0">${sugerido ? `Para llegar a esa fecha, juntá unos <b>${pesos(sugerido)}</b> por mes.` : 'Poné una fecha y te digo cuánto juntar por mes.'}</div>` +
+      `<div class="f"><input id="ap${m.id}" inputmode="decimal" placeholder="Monto a aportar" value="${sugerido || ''}"><button data-a="aportar" data-i="${k}">Aportar</button></div></div>`;
+  }).join('');
+  return '<div class="card"><h2>🎯 Metas</h2>' + metas + '<button class="sec" data-a="agregarMeta">Agregar meta</button>' +
+    '<div class="mut" style="font-size:13px;margin-top:8px">Lo que aportás sale de tu plata disponible, igual que un gasto importante, y baja la base por día de forma pareja.</div></div>';
+}
+
+/* ------------------------------ CLAUDE ------------------------------ */
+function pantallaClaude() {
+  const sugerencias = ['¿En qué se me va más la plata?', '¿Cómo voy contra el presupuesto?', '¿Cuánto puedo gastar por día si pago la nafta?'];
+  return '<div class="card"><h2>Preguntale a Claude</h2><div class="mut" style="margin-bottom:8px">Responde con los datos de tu período.</div>' +
+    `<input id="q" placeholder="Ej: ¿en qué se me va la plata?" value="${escapar(UI.ultimaPregunta)}"><div style="margin:8px 0"><button data-a="preguntar"${UI.pensando ? ' disabled' : ''}>${UI.pensando ? 'Pensando…' : 'Preguntar'}</button></div>` +
+    `<div class="f" style="flex-wrap:wrap">${sugerencias.map(t => `<button class="sec" data-a="sugerencia" data-q="${t}">${t}</button>`).join('')}</div></div>` +
+    `<div class="card" id="ans" style="white-space:pre-wrap">${UI.respuestaIA ? escapar(UI.respuestaIA) : '<span class="mut">La respuesta aparece acá.</span>'}</div>`;
+}
+
+/* ------------------------------ AJUSTES ------------------------------ */
+function pantallaAjustes(c) {
+  const nCierres = Object.keys(S.cierres || {}).length;
+  return [S.demo ? tarjetaDemo() : '',
+    plegable('pin', tarjetaPin(), S.pin ? 'activado' : 'sin PIN'),
+    plegable('apariencia', tarjetaApariencia(), ''),
+    plegable('recordatorio', tarjetaRecordatorio(), ''),
+    plegable('periodo', tarjetaPeriodo(), ''),
+    plegable('fondo', tarjetaModoFondo(), S.modoFondo ? 'activado' : 'desactivado'),
+    plegable('rendimiento', tarjetaRendimiento(), ''),
+    plegable('nuevoperiodo', tarjetaNuevoPeriodo(c), ''),
+    plegable('cierres', tarjetaCierreNocturno(), nCierres + (nCierres === 1 ? ' cierre' : ' cierres')),
+    plegable('copias', tarjetaNube(), textoCopia()), plegable('exportar', tarjetaExcel(), ''),
+    plegable('acerca', tarjetaAcercaDe(), ''),
+    S.demo ? '' : tarjetaDemo(),
+    S.demo ? '' : '<div class="card"><h2>Empezar de cero</h2><button class="sec" data-a="borrarTodo">Borrar todo</button></div>'].join('');
+}
+
+function tarjetaDemo() {
+  if (S.demo) return '<div class="card" style="border:2px solid var(--ac)"><h2>🎬 Modo demo activo</h2>' +
+    '<div class="mut" style="margin-bottom:10px">Estás viendo datos de ejemplo. Lo que anotes acá se descarta al salir. Tus datos reales están guardados aparte y vuelven cuando salís.</div>' +
+    '<div style="font-weight:700;margin:4px 0">▶️ Demo automática para grabar</div>' +
+    '<div class="mut" style="margin-bottom:8px">Se escribe sola: anota un gasto y pone el objetivo por día. Pasos: 1) empezá a grabar la pantalla de Android, 2) volvé acá y tocá Reproducir, 3) hay 5 segundos de cuenta regresiva y arranca. Para cortarla, tocá 3 veces la pantalla.</div>' +
+    `<label style="display:flex;gap:8px;align-items:center;color:var(--tx);margin:8px 0"><input type="checkbox" data-f="demoFrases" ${S.demoFrases === false ? '' : 'checked'}>Mostrar frases en pantalla</label>` +
+    '<div class="f" style="flex-wrap:wrap"><button data-a="reproducirDemo">▶️ Reproducir demo</button><button class="sec" data-a="salirDemo">Salir y volver a mis datos</button></div></div>';
+  return '<div class="card"><h2>🎬 Modo demo</h2>' +
+    '<div class="mut" style="margin-bottom:10px">Carga datos de ejemplo para grabar videos o sacar capturas sin mostrar tu plata. Tus datos reales se guardan aparte y vuelven cuando salís.</div>' +
+    '<button class="sec" data-a="activarDemo">Activar modo demo</button></div>';
+}
+
+function tarjetaAcercaDe() {
+  return '<div class="card"><h2>ℹ️ Acerca de</h2><div style="font-weight:700">Mi plata</div><div class="mut">Versión ' + VERSION + '</div>' +
+    '<div style="margin:10px 0">Hecha por <b>' + AUTOR + '</b>. ¿Dudas, ideas o algo que no anda? Escribime.</div>' +
+    '<div class="f" style="flex-wrap:wrap">' +
+    '<a class="bt wa" href="https://wa.me/' + AUTOR_WA + '" target="_blank" rel="noopener">' + iconoWhatsApp + 'WhatsApp</a>' +
+    '<a class="bt" href="mailto:' + AUTOR_EMAIL + '">✉️ ' + AUTOR_EMAIL + '</a></div>' +
+    pieCopyright() + '</div>';
+}
+
+function tarjetaPin() {
+  if (!S.pin) return '<div class="card"><h2>PIN de seguridad</h2><div class="mut" style="margin-bottom:8px">Protegé tus números con un PIN de 4 a 8 números.</div>' +
+    '<label>PIN nuevo</label><input id="pn" type="password" inputmode="numeric" maxlength="8"><label>Repetir PIN</label><input id="pr" type="password" inputmode="numeric" maxlength="8">' +
+    '<div style="margin-top:10px"><button data-a="activarPin">Activar PIN</button></div></div>';
+  return '<div class="card"><h2>PIN de seguridad</h2><div class="mut" style="margin-bottom:8px">PIN activado. La app se bloquea al volver después de un minuto.</div>' +
+    '<label>PIN actual</label><input id="pa" type="password" inputmode="numeric" maxlength="8"><label>PIN nuevo (para cambiarlo)</label><input id="pn" type="password" inputmode="numeric" maxlength="8">' +
+    `<label style="display:flex;gap:8px;align-items:center;color:var(--tx);margin:12px 0 4px"><input type="checkbox" data-f="pinApp" ${S.pinApp === false ? '' : 'checked'}>Pedir PIN al abrir la app</label>` +
+    '<div class="mut" style="font-size:13px">Si lo desmarcás, la app abre sin PIN y el PIN se pide solo para mostrar el dinero del mes.</div>' +
+    '<div class="f" style="margin-top:10px;flex-wrap:wrap"><button data-a="cambiarPin">Cambiar PIN</button><button class="sec" data-a="quitarPin">Desactivar PIN</button></div></div>';
+}
+
+function tarjetaApariencia() {
+  const temas = [['auto', 'Automático'], ['claro', 'Claro'], ['oscuro', 'Oscuro']].map(([v, t]) =>
+    `<button class="${(S.tema || 'auto') === v ? '' : 'sec'}" data-a="tema" data-v="${v}">${t}</button>`).join('');
+  const colores = Object.entries(PALETAS).map(([k, p]) =>
+    `<button aria-label="${k}" data-a="color" data-v="${k}" style="background:${p[0]};width:40px;height:40px;border-radius:50%;padding:0;border:3px solid ${(S.color || 'azul') === k ? 'var(--tx)' : 'transparent'}"></button>`).join('');
+  return `<div class="card"><h2>Apariencia</h2><div class="mut" style="margin-bottom:8px">Tema</div><div class="f">${temas}</div><div class="mut" style="margin:8px 0">Color</div><div class="f">${colores}</div>` +
+    `<div class="f" style="margin-top:14px"><input type="checkbox" data-f="ocultar"${S.ocultar === true ? ' checked' : ''}><span>Ocultar los montos con puntitos (••••)</span></div></div>`;
+}
+
+function tarjetaPeriodo() {
+  return '<div class="card"><h2>Período y sueldo</h2>' +
+    `<label>Tu nombre</label><input data-f="nombre" value="${escapar(nombreUsuario())}" placeholder="Para el saludo">` +
+    '<div class="mut" style="margin-top:8px">Tus ingresos se cargan en la pestaña Plan.</div>' +
+    `<label>Avisarme cuando me quede menos de este % del presupuesto del día</label><input data-f="aviso" inputmode="decimal" value="${S.aviso ?? 20}">` +
+    `<label>Saldo previo en cuenta</label><input type="${campoDinero()}" data-f="previo" inputmode="decimal" value="${S.previo || ''}" placeholder="Monto">` +
+    `<label>Día que cobrás (inicio)</label><input type="date" data-f="inicio" value="${S.start}">` +
+    `<label>Próximo cobro (fin, ese día ya cobrás de nuevo)</label><input type="date" data-f="fin" value="${S.end}">` +
+    '<div style="margin-top:12px"><button class="sec" data-a="verIntroduccion">Ver la introducción</button></div></div>';
+}
+
+function tarjetaModoFondo() {
+  const on = !!S.modoFondo, regla = S.fondoExceso || 'siguiente';
+  const opcion = (v, t) => `<option value="${v}"${(regla === 'aparte' ? 'aparte' : 'siguiente') === v ? ' selected' : ''}>${t}</option>`;
+  return '<div class="card"><h2>Fondo de ahorro</h2><div class="mut" style="margin-bottom:10px">Si lo activás, lo que no gastás cada día no pasa al día siguiente: se guarda solo en un fondo aparte. Cada día arranca con tu base por día. El fondo se ve en Hoy y se cuenta desde el día en que lo activás: no toca lo que ya tenías.</div>' +
+    `<div class="f"><input type="checkbox" data-f="modoFondo"${on ? ' checked' : ''}><span>Activar el fondo de ahorro</span></div>` +
+    (on ? '<label>Si me paso del límite de un día</label><select data-f="fondoExceso">' +
+      opcion('siguiente', 'Se descuenta del día siguiente') + opcion('aparte', 'No se descuenta de ningún lado') + '</select>' +
+      `<label>Fondo que ya tenías juntado de antes</label><input type="${campoDinero()}" data-f="fondoPrev" inputmode="decimal" value="${S.fondoPrev || ''}" placeholder="Monto">` : '') +
+    '</div>';
+}
+function tarjetaRendimiento() {
+  const hay = !!(S.rendOn || S.rendDispOn);
+  return '<div class="card"><h2>Rendimiento de Mercado Pago</h2>' +
+    '<div class="mut" style="margin-bottom:8px">Tu plata va sumando sola lo que rendiría con la tasa que pongas. Funciona como Mercado Pago: el interés se acredita en días hábiles (lo del fin de semana llega el lunes) y se vuelve a sumar al día siguiente. No contempla feriados. Es una estimación: lo que manda es lo que ves en Mercado Pago. Activalo cuando tu plata esté en Mercado Pago.</div>' +
+    `<div class="f"><input type="checkbox" data-f="rendDispOn"${S.rendDispOn ? ' checked' : ''}><span>Sumar rendimiento a mi dinero disponible</span></div>` +
+    (S.modoFondo ? `<div class="f"><input type="checkbox" data-f="rendOn"${S.rendOn ? ' checked' : ''}><span>Sumar rendimiento a mi fondo de ahorro</span></div>` : '') +
+    (hay ? '<label>Tasa anual (TNA) en %</label>' +
+      `<input inputmode="decimal" data-f="rendTasa" value="${String(S.rendTasa || '').replace('.', ',')}" placeholder="Ej: 19">` : '') +
+    (S.rendOn && S.modoFondo ? `<div class="f" style="margin-top:8px"><input type="checkbox" data-f="rendEnMP"${S.rendEnMP ? ' checked' : ''}><span>Mi fondo ya está en Mercado Pago</span></div>` +
+      '<div class="mut" style="margin-top:4px">Si lo marcás, el rendimiento del fondo también cuenta al comparar con tus cuentas.</div>' : '') +
+    '</div>';
+}
+
+function tarjetaNuevoPeriodo(c) {
+  return '<div class="card"><h2>Nuevo período</h2><div class="mut" style="margin-bottom:8px">Guarda el período actual en el historial y empieza de cero. Quedan los gastos importantes con 🔁 (los de monto variable, con el monto vacío), tus ingresos y las cuotas pasan a la siguiente.</div>' +
+    (c.fondo.activo ? '<div class="mut" style="margin-bottom:8px">Lo que ahorraste en el fondo queda guardado aparte y no se suma al saldo previo del período nuevo.</div>' : '') +
+    '<label>Saldo previo en cuenta</label>' +
+    `<input id="np" inputmode="decimal" value="${Math.max(0, Math.round(c.saldo - (c.fondo.activo ? c.fondo.ahorroPeriodo : 0)))}"><label>Día que cobrás (inicio)</label><input id="nd1" type="date" value="${S.end}">` +
+    `<label>Próximo cobro (fin)</label><input id="nd2" type="date" value="${mesSiguiente(S.end)}"><div style="margin-top:10px"><button data-a="periodoNuevo">Empezar nuevo período</button></div></div>`;
+}
+
+function tarjetaCierreNocturno() {
+  const copias = S.copias || [];
+  return '<div class="card"><h2>Cierre nocturno</h2><div class="mut" style="margin-bottom:8px">Cada noche, antes de cambiar el día, la app congela el estado del día y guarda una copia. Si estaba cerrada a esa hora, lo hace al abrirla.</div>' +
+    (copias.length ? [...copias].reverse().map((cp, k) => `<div class="row"><span>Cierre del ${diaYMes(cp.iso)}</span><button class="sec" data-a="restaurarCierre" data-i="${copias.length - 1 - k}">Restaurar</button></div>`).join('')
+      : '<div class="mut">Todavía no hay copias.</div>') + '</div>';
+}
+
+function textoCopia() {
+  const e = estadoCopia(S, Date.now());
+  return e.dias === null ? 'sin copias' : (e.dias === 0 ? 'copia de hoy' : 'hace ' + e.dias + (e.dias === 1 ? ' día' : ' días'));
+}
+
+function tarjetaNube() {
+  const e = estadoCopia(S, Date.now()), cada = S.diasCopia === undefined ? 7 : S.diasCopia;
+  const estado = e.dias === null ? '<span class="warn">Todavía no guardaste ninguna copia.</span>'
+    : `Última copia: ${e.dias === 0 ? 'hoy' : 'hace ' + e.dias + (e.dias === 1 ? ' día' : ' días')}.`;
+  const opciones = [[7, 'cada 7 días'], [3, 'cada 3 días'], [15, 'cada 15 días'], [0, 'no recordarme']]
+    .map(([v, t]) => `<option value="${v}"${cada === v ? ' selected' : ''}>${t}</option>`).join('');
+  return '<div class="card"><h2>☁️ Guardar en la nube</h2><div class="mut" style="margin-bottom:10px">' +
+    (CONFIG.apk ? 'Se abre el menú de Android: elegí <b>Google Drive</b> (o Gmail, WhatsApp, lo que prefieras) y guardá el archivo.'
+                : 'Guarda un archivo con todos tus datos. Subilo a Google Drive o donde prefieras.') + '</div>' +
+    `<div class="f" style="flex-wrap:wrap"><button data-a="guardarNube">☁️ Guardar en la nube</button>` +
+    (CONFIG.apk ? '<button class="sec" data-a="guardarEnTelefono">📱 Guardar en el teléfono</button>' : '') + '</div>' +
+    (CONFIG.apk ? '<div class="mut" style="font-size:13px;margin-top:6px">"En el teléfono" lo deja en la carpeta <b>Documentos → MiPlata</b>.</div>' : '') +
+    `<div class="mut" style="margin:8px 0 14px">${estado}</div>` +
+    '<h2>📥 Recuperar mis datos</h2><div class="mut" style="margin-bottom:10px">Si cambiaste de teléfono o lo formateaste: instalá la app, tocá este botón y elegí tu copia desde <b>Drive</b> o desde el teléfono.</div>' +
+    '<div class="f"><button class="sec" data-a="recuperarNube">📥 Recuperar desde la nube</button></div>' +
+    '<input id="fi" type="file" accept=".json,.txt,application/json,text/plain" style="display:none">' +
+    (CONFIG.nube ? `<div class="f" style="margin-top:8px"><button class="sec" data-a="sincronizar">Sincronizar con mi cuenta de Claude</button></div><div class="mut">${mensajeNube}</div>` : '') +
+    `<label>Recordarme guardar una copia</label><select data-f="diasCopia">${opciones}</select>` +
+    '<details style="margin-top:12px"><summary class="mut">Avanzado: pegar el texto de una copia</summary><textarea id="bk" rows="4"></textarea>' +
+    '<div style="margin-top:8px"><button class="sec" data-a="restaurar">Restaurar desde el texto</button></div></details></div>';
+}
+
+function tarjetaExcel() {
+  return '<div class="card"><h2>📊 Exportar</h2><div class="mut" style="margin-bottom:10px">Un resumen del período con el día por día, tus gastos y tus gastos importantes.</div>' +
+    '<div class="f" style="flex-wrap:wrap"><button data-a="exportarXlsx">📗 Excel (.xlsx)</button><button data-a="exportarPdf">📄 PDF</button></div>' +
+    '<div class="mut" style="margin:12px 0 6px;font-size:13px">También en CSV:</div>' +
+    '<div class="f" style="flex-wrap:wrap"><button class="sec" data-a="csvDias">Exportar días</button><button class="sec" data-a="csvImportantes">Exportar gastos importantes</button></div></div>';
+}
+
+function tarjetaRecordatorio() {
+  const hora = S.recHora || '21:00';
+  if (!CONFIG.apk) return '<div class="card"><h2>🔔 Recordatorio diario</h2><div class="mut">Está disponible en la app de Android.</div></div>';
+  return '<div class="card"><h2>🔔 Recordatorio diario</h2><div class="mut" style="margin-bottom:10px">Te avisa todos los días a la hora que elijas para que anotes tus gastos.</div>' +
+    `<div class="f"><input type="checkbox" data-f="recOn"${S.recOn ? ' checked' : ''}><span>Activar recordatorio</span></div>` +
+    `<label>¿A qué hora?</label><input type="time" data-f="recHora" value="${hora}"></div>`;
+}
+
+/* ------------------------------ BLOQUEO ------------------------------ */
+function pantallaBloqueo() {
+  return '<div class="card" style="margin-top:20vh;text-align:center"><div style="font-size:22px;font-weight:700">🔒 Mi plata</div><div class="mut" style="margin:6px 0 12px">Ingresá tu PIN</div>' +
+    '<input id="pin" type="password" inputmode="numeric" maxlength="8" autocomplete="off" style="text-align:center;font-size:22px;letter-spacing:6px">' +
+    '<div style="margin-top:12px"><button data-a="desbloquear">Entrar</button></div>' +
+    `<div class="mut" style="margin-top:12px;font-size:13px">${CONFIG.claude ? '¿Lo olvidaste? Pedile a Claude que te lo restablezca.' : '¿Lo olvidaste? Hay que borrar los datos de la app y empezar de nuevo.'}</div></div>`;
+}
+
+/* ------------------------------ RESUMEN PARA COMPARTIR ------------------------------ */
+function ventanaResumen() {
+  const hoy = hoyISO(), c = calcular(S, hoy);
+  const fecha = new Date().toLocaleDateString('es-AR', { weekday: 'long', day: 'numeric', month: 'long' });
+  let texto = '💰 Mi plata · ' + fecha + '\nPresupuesto de hoy: ' + pesos(c.quedaHoy + c.gastoHoy) + '\nGasté hoy: ' + pesos(c.gastoHoy) + '\nMe queda para hoy: ' + pesos(c.quedaHoy);
+  if (c.manana != null) texto += '\nMañana tendré: ' + pesos(c.manana);
+  if (c.fondo.activo) texto += '\n🏦 Mi fondo de ahorro: ' + pesos(c.fondo.totalConRend);
+  texto += '\nDías hasta el próximo cobro: ' + c.faltan;
+  metasDe().filter(m => m.t > 0).forEach(m => { texto += '\n🎯 ' + m.n + ': ' + Math.round(juntadoEnMeta(S, m) / m.t * 100) + '% juntado'; });
+  texto += '\n\n“' + fraseDelDia(hoy) + '”';
+  const v = crearModal('<div style="font-weight:700;margin-bottom:6px">Resumen para compartir</div><div class="mut" style="font-size:13px">Podés editar el texto antes de enviarlo.</div>' +
+    '<textarea id="rt" rows="9"></textarea><div class="f" style="margin-top:10px;flex-wrap:wrap"><a class="bt" id="rw" target="_blank" rel="noopener">WhatsApp</a>' +
+    '<button class="sec" id="rc">Copiar</button><button class="sec" id="rx">Cerrar</button></div>', 380);
+  const caja = v.querySelector('#rt'), enlace = v.querySelector('#rw');
+  caja.value = texto;
+  const actualizar = () => { enlace.href = 'https://wa.me/?text=' + encodeURIComponent(caja.value); };
+  caja.oninput = actualizar; actualizar();
+  v.querySelector('#rc').onclick = () => { caja.select(); let ok = false; try { ok = document.execCommand('copy'); } catch (_) {} aviso(ok ? 'Copiado.' : 'Mantené apretado el texto para copiarlo.'); };
+  v.querySelector('#rx').onclick = () => v.remove();
+}
+
+/* ------------------------------ DIBUJAR ------------------------------ */
+function dibujar() {
+  aplicarTema();
+  const nav = document.querySelector('nav'), principal = document.getElementById('m'), fab = document.getElementById('fab');
+  /* el degradado de abajo es solo para la app; en la introducción y el bloqueo taparía el botón */
+  if (bloqueada || !S.bienvenida) document.body.classList.add('sin-degradado'); else document.body.classList.remove('sin-degradado');
+  if (bloqueada) { nav.style.display = 'none'; fab.style.display = 'none'; principal.innerHTML = pantallaBloqueo(); return; }
+  if (!S.bienvenida) { nav.style.display = 'none'; fab.style.display = 'none'; principal.innerHTML = pantallaBienvenida(); return; }
+  nav.style.display = ''; fab.style.display = '';
+  document.querySelectorAll('nav button').forEach(b => b.classList.toggle('on', b.dataset.t === UI.pestana));
+  const pantallas = { plan: pantallaPlan, hoy: pantallaHoy, dias: pantallaDias, claude: pantallaClaude, ajustes: pantallaAjustes };
+  principal.innerHTML = (pantallas[UI.pestana] || pantallaHoy)(calcular(S, hoyISO())) +
+    '<div class="mut" style="text-align:center;margin-top:12px;font-size:13px">Versión ' + VERSION + (S.demo ? ' · modo demo' : '') + (mensajeNube ? ' · ' + mensajeNube : '') + '</div>' +
+    pieCopyright();
+}
+
+/* =====================================================================
+   09 · ACCIONES — qué pasa cuando se toca un botón o se cambia un campo.
+   Cada botón de la pantalla tiene un nombre (data-a) y su función acá.
+   Si la acción devuelve SIN_GUARDAR, no se guarda ni se redibuja.
+   ===================================================================== */
+const SIN_GUARDAR = Symbol('sin-guardar');
+const valorDe = id => document.getElementById(id).value;
+
+/* Recupera los datos desde el texto de una copia (archivo elegido o texto pegado) */
+async function restaurarDesdeTexto(texto) {
+  if (S.demo) { aviso('En modo demo no se puede restaurar. Salí del modo demo en Ajustes.'); return false; }
+  let datos;
+  try {
+    datos = JSON.parse(texto);
+    if (!datos || !datos.items || !datos.spent) throw new Error('copia inválida');
+  } catch (_) { aviso('Ese archivo no es una copia válida de Mi plata.'); return false; }
+  if (!(await confirmar('Esto reemplaza los datos actuales por los de la copia. ¿Seguir?'))) return false;
+  S = migrarEstado(datos);
+  guardar(); dibujar(); aviso('Datos recuperados.');
+  return true;
+}
+
+const ACCIONES = {
+  /* --- gastos diarios --- */
+  async anotar() {
+    const monto = aNumero(valorDe('am'));
+    if (!monto) return SIN_GUARDAR;
+    const gasto = { date: valorDe('dt') || hoyISO(), amt: monto, note: valorDe('nt'), cat: UI.categoria || undefined };
+    if (estaCerrado(S, gasto.date) && !(await confirmar('Ese día ya está cerrado. ¿Anotarlo igual?'))) return SIN_GUARDAR;
+    if (UI.editando) {
+      const existente = S.spent.find(e => e.id === UI.editando);
+      if (existente) Object.assign(existente, gasto);
+      UI.editando = null;
+    } else S.spent.push({ id: Date.now(), ...gasto });
+    UI.borrador = {}; UI.categoria = '';
+  },
+  categoria(el) {      // elegir o quitar la categoría sin perder lo que ya se escribió
+    UI.borrador = { amt: valorDe('am'), note: valorDe('nt'), date: valorDe('dt') };
+    UI.categoria = UI.categoria === el.dataset.v ? '' : el.dataset.v;
+    dibujar(); return SIN_GUARDAR;
+  },
+  editar(el) {
+    const gasto = S.spent.find(e => e.id === +el.dataset.i);
+    UI.editando = +el.dataset.i; UI.borrador = {}; UI.categoria = (gasto && gasto.cat) || '';
+    dibujar(); document.getElementById('am').focus(); return SIN_GUARDAR;
+  },
+  cancelarEdicion() { UI.editando = null; UI.borrador = {}; UI.categoria = ''; dibujar(); return SIN_GUARDAR; },
+  async borrar(el) {
+    const gasto = S.spent.find(x => x.id == el.dataset.i);
+    if (gasto && estaCerrado(S, gasto.date) && !(await confirmar('Ese día ya está cerrado. ¿Borrarlo igual?'))) return SIN_GUARDAR;
+    S.spent = S.spent.filter(x => x.id != el.dataset.i);
+  },
+  dictar() { dictarGasto(); return SIN_GUARDAR; },
+  verTodos() { UI.verTodos = !UI.verTodos; dibujar(); return SIN_GUARDAR; },
+  plegar(el) { UI.abiertos[el.dataset.s] = !UI.abiertos[el.dataset.s]; dibujar(); return SIN_GUARDAR; },
+  resumen() { ventanaResumen(); return SIN_GUARDAR; },
+  recalibrar() {
+    const c = calcular(S, hoyISO());
+    S.objetivo = 0; S.objetivoDesde = '';                         // no pueden convivir con el objetivo
+    S.recal = { day: c.hoyIdx, base: (c.disp - c.gastadoAntesDeHoy) / c.faltan };
+  },
+  quitarRecalibracion() { S.recal = null; S.objetivo = 0; S.objetivoDesde = ''; },
+
+  /* --- gastos importantes --- */
+  agregarGasto() {      // un gasto nuevo con el período empezado se descuenta desde hoy
+    const hoy = hoyISO(), empezado = numeroDeDia(hoy) >= numeroDeDia(S.start);
+    S.items.push({ n: '', a: 0, p: false, f: false, v: false,
+      d: empezado ? isoDeNumero(Math.min(numeroDeDia(hoy), numeroDeDia(S.end) - 1)) : '' });
+  },
+  quitarGasto(el) { S.items.splice(+el.dataset.i, 1); },
+  alternarPagado(el) { const it = S.items[+el.dataset.i]; it.p = !it.p; },
+  agregarProximo() { (S.proximos = S.proximos || []).push({ n: '', a: 0 }); },
+  quitarProximo(el) { S.proximos.splice(+el.dataset.i, 1); },
+  ponerCuotas(el) { S.items[+el.dataset.i].q = { actual: 1, total: 12 }; },
+  quitarCuotas(el) { delete S.items[+el.dataset.i].q; },
+
+  /* --- ingresos y primera introducción --- */
+  agregarIngreso() { (S.ingresos = S.ingresos || []).push({ cat: CATEGORIAS_INGRESO[0], a: 0 }); },
+  quitarIngreso(el) { S.ingresos.splice(+el.dataset.i, 1); },
+  pasoSiguiente() {
+    if (UI.paso === 3) {                                  // ingresos: hay que cargar al menos uno
+      if (!(totalIngresos(S) > 0)) { aviso('Cargá al menos un ingreso para seguir.'); return SIN_GUARDAR; }
+      if (numeroDeDia(S.end) <= numeroDeDia(S.start)) { aviso('Revisá las fechas del mes.'); return SIN_GUARDAR; }
+    }
+    if (UI.paso < 5) { UI.paso += 1; dibujar(); scrollTo(0, 0); return SIN_GUARDAR; }
+    S.bienvenida = true; UI.paso = 0; UI.pestana = 'hoy'; scrollTo(0, 0);
+  },
+  pasoAtras() { UI.paso = Math.max(0, UI.paso - 1); dibujar(); scrollTo(0, 0); return SIN_GUARDAR; },
+  verIntroduccion() { S.bienvenida = false; UI.paso = 0; scrollTo(0, 0); },
+
+  /* --- cuentas y recomposiciones --- */
+  agregarCuenta() { cuentasDe().push({ n: '', m: 0 }); },
+  quitarCuenta(el) { cuentasDe().splice(+el.dataset.i, 1); },
+  ajustarCuentas() {
+    const cc = conciliar(S, calcular(S, hoyISO()));
+    if (!cc.hayCuentas) { aviso('Cargá el saldo de una cuenta primero.'); return SIN_GUARDAR; }
+    if (Math.abs(cc.diferencia) < 1) { aviso('Ya coincide.'); return SIN_GUARDAR; }
+    UI.ajustePendiente = cc.diferencia; dibujar(); return SIN_GUARDAR;
+  },
+  ajusteNo() { UI.ajustePendiente = null; dibujar(); return SIN_GUARDAR; },
+  ajusteSi() {
+    const hoy = hoyISO();
+    (S.ajustes = S.ajustes || []).push({ id: Date.now(), date: hoy, desde: mananaISO(hoy),
+      amt: redondear2(UI.ajustePendiente), note: 'Recomposición' });
+    UI.ajustePendiente = null; aviso('Recomposición anotada.');
+  },
+  async quitarRecomposicion(el) {
+    if (!(await confirmar('¿Quitar esta recomposición?'))) return SIN_GUARDAR;
+    S.ajustes.splice(+el.dataset.i, 1);
+  },
+
+  /* --- fondo de ahorro --- */
+  usarFondo() { UI.usandoFondo = true; dibujar(); return SIN_GUARDAR; },
+  cancelarUsoFondo() { UI.usandoFondo = false; dibujar(); return SIN_GUARDAR; },
+  confirmarUsoFondo() {
+    const monto = aNumero(valorDe('fu'));
+    if (!monto) return SIN_GUARDAR;
+    (S.fondoUsos = S.fondoUsos || []).push({ id: Date.now(), date: hoyISO(), amt: monto, note: valorDe('fn').trim(), para: valorDe('fp') === 'cubre' ? 'cubre' : 'hoy' });
+    UI.usandoFondo = false; aviso('Listo: sacaste ' + pesos(monto) + ' del fondo.');
+  },
+  async quitarUsoFondo(el) {
+    if (!(await confirmar('¿Quitar este retiro? El monto vuelve al fondo.'))) return SIN_GUARDAR;
+    S.fondoUsos.splice(+el.dataset.i, 1);
+  },
+
+  /* --- metas --- */
+  agregarMeta() { metasDe().push({ id: Date.now(), n: '', t: 0, g0: 0, f: '' }); },
+  async quitarMeta(el) {
+    if (!(await confirmar('¿Borrar la meta? Los aportes ya hechos quedan descontados de tu plata.'))) return SIN_GUARDAR;
+    metasDe().splice(+el.dataset.i, 1);
+  },
+  aportar(el) {
+    const meta = metasDe()[+el.dataset.i], monto = aNumero(valorDe('ap' + meta.id));
+    if (!monto) return SIN_GUARDAR;
+    S.spent.push({ id: Date.now(), date: hoyISO(), amt: monto, note: '🎯 ' + meta.n, meta: meta.id });
+  },
+
+  /* --- período, copias y exportaciones --- */
+  async periodoNuevo() {
+    const inicio = valorDe('nd1'), fin = valorDe('nd2');
+    if (!inicio || !fin || numeroDeDia(fin) <= numeroDeDia(inicio)) { aviso('Revisá las fechas.'); return SIN_GUARDAR; }
+    if (!(await confirmar('Se guarda el período actual en el historial y empieza uno nuevo. Los gastos importantes sin 🔁 se sacan; los de monto variable quedan vacíos. ¿Seguir?'))) return SIN_GUARDAR;
+    const terminadas = iniciarPeriodo(S, hoyISO(), { previo: aNumero(valorDe('np')), inicio, fin });
+    UI.pestana = 'hoy'; UI.editando = null;
+    if (terminadas.length) aviso('Terminaste de pagar: ' + terminadas.join(', '));
+  },
+  async restaurarCierre(el) {
+    const copia = (S.copias || [])[+el.dataset.i];
+    if (!copia) return SIN_GUARDAR;
+    if (!(await confirmar('Se restaura el estado al cierre del ' + diaYMes(copia.iso) + '. ¿Seguir?'))) return SIN_GUARDAR;
+    const actual = S;
+    S = migrarEstado(JSON.parse(copia.json));
+    S.copias = actual.copias; S.cierres = actual.cierres;            // el historial y el PIN no se tocan
+    S.pin = actual.pin; S.salt = actual.salt; S.pinApp = actual.pinApp;
+  },
+  csvDias() {
+    const hoy = hoyISO(), c = calcular(S, hoy);
+    descargar('dias.csv', csvDe([['Fecha', 'Día', 'Presupuesto del día', 'Gasto real', 'Sobrante']].concat(
+      diasDelPeriodo(S, hoy).map(x => [diaYMes(x.iso) + '/' + x.iso.slice(0, 4), x.dia, Math.round(x.presupuesto),
+        x.gasto ? Math.round(x.gasto) : '', (x.i <= c.hoyIdx || x.gasto) ? Math.round(x.sobra) : '']))));
+    return SIN_GUARDAR;
+  },
+  csvImportantes() {
+    descargar('gastos-importantes.csv', csvDe([['Concepto', 'Monto', 'Estado']].concat(
+      S.items.filter(i => i.n || i.a).map(i => [i.n, i.a, i.p ? 'Pagado' : 'Pendiente']))));
+    return SIN_GUARDAR;
+  },
+  async exportarXlsx() {
+    try { const d = datosExportar(S, hoyISO()); await entregarArchivo('mi-plata-' + d.hoy + '.xlsx', xlsxExportar(d), 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'); }
+    catch (_) { aviso('No se pudo armar el Excel.'); }
+    return SIN_GUARDAR;
+  },
+  async exportarPdf() {
+    try { const d = datosExportar(S, hoyISO()); await entregarArchivo('mi-plata-' + d.hoy + '.pdf', pdfExportar(d), 'application/pdf'); }
+    catch (_) { aviso('No se pudo armar el PDF.'); }
+    return SIN_GUARDAR;
+  },
+  async guardarEnTelefono() {
+    const nombre = 'mi-plata-copia-' + hoyISO() + '.json';
+    if (await guardarEnDocumentos(nombre, JSON.stringify(S))) {
+      S.ultimaCopia = Date.now(); S.posponerCopia = 0;
+      aviso('Guardado en Documentos/MiPlata/' + nombre);
+      return;
+    }
+    aviso('No se pudo guardar en el teléfono. Probá con "Guardar en la nube".');
+    return SIN_GUARDAR;
+  },
+  async guardarNube() {
+    const guardada = await descargar('mi-plata-copia.json', JSON.stringify(S));
+    if (!guardada) return SIN_GUARDAR;
+    S.ultimaCopia = Date.now(); S.posponerCopia = 0;       // el archivo se hizo antes de anotar la fecha
+    aviso('Copia guardada.');
+  },
+  posponerCopia() { S.posponerCopia = Date.now() + 3 * MS_DIA; },
+
+  /* --- modo demo --- */
+  async activarDemo() {
+    if (S.demo) return SIN_GUARDAR;
+    if (!(await confirmar('Se cargan datos de ejemplo para grabar videos. Tus datos reales quedan guardados aparte y vuelven cuando salís. Mientras tanto, lo que anotes se descarta. ¿Activar?'))) return SIN_GUARDAR;
+    const real = JSON.stringify(S);
+    try {
+      localStorage.setItem(CLAVE_REAL, real);
+      if (localStorage.getItem(CLAVE_REAL) !== real) throw new Error('no se guardó');
+    } catch (_) { aviso('No se pudo guardar tu copia, así que no se activó el modo demo.'); return SIN_GUARDAR; }
+    if (CONFIG.apk) { try { await guardarEnDocumentos('mi-plata-antes-del-demo.json', real); } catch (_) {} }
+    S = estadoDemo(S);
+    const hoy = hoyISO();
+    aplicarObjetivo(12000);
+    S.objetivoDesde = isoDeNumero(numeroDeDia(S.start) + 2);
+    ajustarCuentasDemo();
+    UI.pestana = 'ajustes';
+    aviso('Modo demo activado. Acá abajo podés reproducir la demo automática.');
+  },
+  async reproducirDemo() { if (S.demo) await correrDemo(); return SIN_GUARDAR; },
+  async salirDemo() {
+    if (!S.demo) return SIN_GUARDAR;
+    let real = null;
+    try { real = JSON.parse(localStorage.getItem(CLAVE_REAL)); } catch (_) {}
+    if (real && real.items) {
+      if (!(await confirmar('Se descartan los datos de ejemplo y vuelven los tuyos. ¿Salir del modo demo?'))) return SIN_GUARDAR;
+      S = migrarEstado(real);
+      try { localStorage.removeItem(CLAVE_REAL); } catch (_) {}
+      aviso('Listo: volvieron tus datos.');
+    } else {
+      if (!(await confirmar('No encuentro tus datos guardados. ¿Salir igual y empezar de cero? Después podés recuperar tu copia desde la pantalla de inicio.'))) return SIN_GUARDAR;
+      S = estadoInicial(hoyISO());
+    }
+    UI.pestana = 'ajustes';
+  },
+  recuperarNube() { const selector = document.getElementById('fi'); if (selector && selector.click) selector.click(); return SIN_GUARDAR; },
+  async restaurar() { await restaurarDesdeTexto(valorDe('bk')); return SIN_GUARDAR; },
+  async borrarTodo() {
+    if (!(await confirmar('¿Borrar todos los datos?'))) return SIN_GUARDAR;
+    S = estadoInicial(hoyISO());
+  },
+  sincronizar() { traerDeNube(); return SIN_GUARDAR; },
+
+  /* --- apariencia, PIN y Claude --- */
+  usarObjetivo() { aplicarObjetivo(S.objetivo); aviso('Listo: tu límite de hoy ahora es ' + pesos(S.objetivo) + '.'); },
+  usarBase() {      // el límite que daría la app sin el objetivo
+    const sinObjetivo = Object.assign({}, S, { recal: (S.recal && S.recal.obj) ? null : S.recal });
+    aplicarObjetivo(calcular(sinObjetivo, hoyISO()).baseHoy);
+    aviso('Listo: tu límite de hoy es ' + pesos(S.objetivo) + '.');
+  },
+  tema(el) { S.tema = el.dataset.v; },
+  color(el) { S.color = el.dataset.v; },
+  mostrarOcultar() { mostrarOcultarDinero(); return SIN_GUARDAR; },
+  desbloquear() { desbloquear(); return SIN_GUARDAR; },
+  activarPin() { operacionPin('on'); return SIN_GUARDAR; },
+  cambiarPin() { operacionPin('change'); return SIN_GUARDAR; },
+  quitarPin() { operacionPin('off'); return SIN_GUARDAR; },
+  preguntar() { const q = valorDe('q').trim(); if (q) preguntarAClaude(q); return SIN_GUARDAR; },
+  sugerencia(el) { preguntarAClaude(el.dataset.q); return SIN_GUARDAR; },
+};
+
+/* Campos que se editan escribiendo: nombre del campo -> qué cambia */
+const CAMBIOS = {
+  nombre:        v => { if (S.demo) return; S.nombre = v.trim(); },
+  objetivo:      v => {
+    const antes = S.objetivo || 0;
+    aplicarObjetivo(aNumero(v));
+    if ((S.objetivo || 0) !== antes) aviso(S.objetivo > 0 ? 'Listo: tu límite de hoy ahora es ' + pesos(S.objetivo) + '.' : 'Volviste a tu límite normal.');
+  },
+  ocultar:       (v, el) => { S.ocultar = el.checked; UI.mostrarDinero = false; },
+  recOn:         (v, el) => {
+    S.recOn = el.checked;
+    programarRecordatorio(true).then(r => {
+      if (r === 'permiso') { S.recOn = false; guardar(); dibujar(); aviso('Falta el permiso de notificaciones: activalo en los ajustes del teléfono.'); }
+      else if (r === false) aviso('No se pudo programar el recordatorio.');
+      else if (S.recOn) aviso('Recordatorio activado a las ' + (S.recHora || '21:00') + '.');
+    });
+  },
+  recHora:       v => { if (v) { S.recHora = v; if (S.recOn) programarRecordatorio(true); } },
+  diasCopia:     v => { S.diasCopia = Math.max(0, Math.round(aNumero(v))); },
+  previo:        v => { S.previo = aNumero(v); },
+  modoFondo:     (v, el) => { S.modoFondo = el.checked; if (el.checked) S.fondoDesde = hoyISO(); UI.usandoFondo = false; },
+  fondoExceso:   v => { S.fondoExceso = ['siguiente', 'fondo', 'aparte'].includes(v) ? v : 'siguiente'; },
+  fondoPrev:     v => { S.fondoPrev = aNumero(v); },
+  rendOn:        (v, el) => { S.rendOn = el.checked; if (el.checked) { S.rendDesde = hoyISO(); S.rendPrev = 0; if (!S.rendTasa) S.rendTasa = 19; } },
+  rendTasa:      v => { S.rendTasa = Math.min(300, Math.max(0, +String(v).replace(',', '.').replace(/[^\d.]/g, '') || 0)); },
+  rendEnMP:      (v, el) => { S.rendEnMP = el.checked; },
+  rendDispOn:    (v, el) => { S.rendDispOn = el.checked; if (el.checked) { S.rendDispDesde = hoyISO(); if (!S.rendTasa) S.rendTasa = 19; } },
+  aviso:         v => { S.aviso = Math.min(100, Math.max(0, aNumero(v))); },
+  inicio:        v => { if (v) S.start = v; },
+  fin:           v => { if (v) S.end = v; },
+  pinApp:        (v, el) => { S.pinApp = el.checked; },
+  demoFrases:    (v, el) => { S.demoFrases = el.checked; },
+  cuentaNombre:  (v, el, k) => { cuentasDe()[k].n = v; },
+  cuentaSaldo:   (v, el, k) => { cuentasDe()[k].m = aNumero(v); },
+  cuentaCuenta:  (v, el, k) => { cuentasDe()[k].x = !el.checked; },
+  metaNombre:    (v, el, k) => { metasDe()[k].n = v; },
+  metaObjetivo:  (v, el, k) => { metasDe()[k].t = aNumero(v); },
+  metaPrevio:    (v, el, k) => { metasDe()[k].g0 = aNumero(v); },
+  metaFecha:     (v, el, k) => { metasDe()[k].f = v; },
+  itemNombre:    (v, el, k) => { S.items[k].n = v; },
+  proxNombre:    (v, el, k) => { S.proximos[k].n = v; },
+  proxMonto:     (v, el, k) => { S.proximos[k].a = aNumero(v); },
+  itemProx:      (v, el, k) => { if (String(v).trim() === '') delete S.items[k].prox; else S.items[k].prox = aNumero(v); },
+  itemMonto:     (v, el, k) => {
+    /* Con el período ya empezado, lo nuevo (un monto recién cargado o un aumento) se descuenta
+       desde hoy, repartido entre los días que faltan; lo que ya estaba no se toca. */
+    const it = S.items[k], antes = montoDe(it), nuevo = aNumero(v), hoy = hoyISO();
+    if (numeroDeDia(hoy) >= numeroDeDia(S.start) && nuevo !== antes) {
+      const desde = isoDeNumero(Math.min(numeroDeDia(hoy), numeroDeDia(S.end) - 1));
+      if (antes === 0) { it.d = desde; delete it.x; }
+      else if (nuevo > antes) (it.x = it.x || []).push({ amt: redondear2(nuevo - antes), desde });
+      else {                                           // baja: primero se sacan los aumentos más nuevos
+        let baja = antes - nuevo;
+        while (baja > 0 && it.x && it.x.length) {
+          const u = it.x[it.x.length - 1];
+          if (u.amt > baja) { u.amt = redondear2(u.amt - baja); baja = 0; } else { baja -= u.amt; it.x.pop(); }
+        }
+        if (it.x && !it.x.length) delete it.x;
+      }
+    }
+    it.a = nuevo;
+  },
+  itemPagado:    (v, el, k) => { S.items[k].p = el.checked; },
+  itemRepite:    (v, el, k) => { S.items[k].f = el.checked; if (!el.checked) S.items[k].v = false; },
+  itemVariable:  (v, el, k) => { S.items[k].v = el.checked; },
+  ingresoCategoria: (v, el, k) => { S.ingresos[k].cat = v; },
+  ingresoMonto:  (v, el, k) => { S.ingresos[k].a = aNumero(v); },
+  cuotaActual:   (v, el, k) => { const q = S.items[k].q; q.actual = Math.max(1, Math.round(aNumero(v))); if (q.actual > q.total) q.total = q.actual; },
+  cuotaTotal:    (v, el, k) => {
+    const gasto = S.items[k], total = Math.round(aNumero(v));
+    if (total <= 1) delete gasto.q; else { gasto.q.total = total; if (gasto.q.actual > total) gasto.q.actual = total; }
+  },
+};
+
+/* --- despacho: el único lugar donde se ejecutan las acciones --- */
+async function alHacerClic(e) {
+  const fila = e.target.closest('.tb[data-d]');
+  if (fila) { ventanaDia(fila.dataset.d); return; }
+  const accion = e.target.dataset.a;
+  if (accion) await ejecutar(accion, e.target, false);
+}
+async function ejecutar(accion, elemento, autorizado) {
+  if (S.demo && BLOQUEADAS_EN_DEMO.includes(accion)) { aviso('En modo demo no se puede hacer eso. Salí del modo demo en Ajustes.'); return; }
+  if (ACCIONES_PROTEGIDAS.includes(accion) && S.pin && !autorizado) {       // pide PIN y reintenta
+    if (!(await pedirPin('Continuar'))) return;
+    return ejecutar(accion, elemento, true);
+  }
+  const hacer = ACCIONES[accion];
+  if (!hacer) return;
+  if (await hacer(elemento) === SIN_GUARDAR) return;
+  guardar(); dibujar();
+  if (accion === 'anotar') alertaDeLimite();
+}
+function alertaDeLimite() {
+  const [clase, mensaje] = semaforo(calcular(S, hoyISO()), S);
+  if (!clase) return;
+  try { navigator.vibrate && navigator.vibrate([200, 100, 200]); } catch (_) {}
+  pitido(); aviso(mensaje);
+}
+function alHacerCambio(e) {
+  const el = e.target;
+  if (el.id === 'ph') { if (el.files[0]) leerTicket(el.files[0]); return; }
+  if (el.id === 'fi') {                       // se eligió un archivo de copia (por ejemplo desde Drive)
+    const archivo = el.files[0];
+    if (archivo) {
+      const lector = new FileReader();
+      lector.onload = () => { restaurarDesdeTexto(lector.result); el.value = ''; };
+      lector.readAsText(archivo);
+    }
+    return;
+  }
+  const campo = el.dataset.f;
+  if (!campo || !CAMBIOS[campo]) return;
+  CAMBIOS[campo](el.value, el, el.dataset.k);
+  guardar(); dibujar();
+}
+
+/* Botón flotante "＋": lleva a Hoy con el cursor en el monto, desde cualquier pantalla */
+function abrirAnotarGasto() {
+  UI.pestana = 'hoy'; UI.editando = null; UI.borrador = {}; UI.categoria = '';
+  dibujar(); scrollTo(0, 0);
+  const monto = document.getElementById('am');
+  if (monto && monto.focus) monto.focus();
+}
+
+/* El objetivo pasa a ser el límite diario oficial desde hoy. Se apoya en la recalibración (S.recal):
+   desde hoy cada día vale `base` = objetivo, y lo que no se gaste se arrastra al día siguiente.
+   La marca `obj: true` permite sacarla al borrar el objetivo sin tocar una recalibración hecha a mano. */
+function aplicarObjetivo(valor) {
+  const n = Math.max(0, Math.round(+valor || 0)), hoy = hoyISO(), c = calcular(S, hoy);
+  if (n > 0 && n === S.objetivo && S.recal && S.recal.obj) return;          // mismo número: no se reinicia nada
+  S.objetivo = n;
+  if (n > 0) { S.objetivoDesde = hoy; S.recal = { day: c.hoyIdx, base: n, obj: true }; }
+  else { S.objetivoDesde = ''; if (S.recal && S.recal.obj) S.recal = null; }
+}
+
+/* =====================================================================
+   DEMO AUTOMÁTICA — escribe sola los datos de ejemplo para grabar la pantalla.
+   Solo anda en modo demo. Tocar 3 veces la pantalla la corta.
+   ===================================================================== */
+let demoCorriendo = false, demoCancelada = false, demoRitmo = 1;     // demoRitmo: 1 = velocidad normal
+const DEMO_CORTADA = 'demo-cortada';
+async function pausaDemo(ms) {
+  const fin = Date.now() + ms * demoRitmo;
+  while (Date.now() < fin) {
+    if (demoCancelada) throw new Error(DEMO_CORTADA);
+    await new Promise(r => setTimeout(r, Math.max(0, Math.min(100, fin - Date.now()))));
+  }
+  if (demoCancelada) throw new Error(DEMO_CORTADA);
+}
+const buscarDemo = sel => document.querySelector(sel);
+function demoFrase(texto) {
+  let f = document.getElementById('demo-frase');
+  if (!texto || S.demoFrases === false) { if (f) f.classList.remove('on'); return; }
+  if (!f) { f = document.createElement('div'); f.id = 'demo-frase'; document.body.appendChild(f); }
+  f.textContent = texto; f.classList.add('on');
+}
+function demoCapa(encender) {
+  let c = document.getElementById('demo-capa');
+  if (!encender) { if (c) c.remove(); return; }
+  if (c) return;
+  c = document.createElement('div'); c.id = 'demo-capa';
+  let toques = [];
+  c.addEventListener('click', () => {                       // 3 toques seguidos cortan la demo
+    const t = Date.now(); toques = toques.filter(x => t - x < 1200).concat(t);
+    if (toques.length >= 3) demoCancelada = true;
+  });
+  document.body.appendChild(c);
+}
+function demoToque(el) {
+  if (!el || !el.getBoundingClientRect) return;
+  const r = el.getBoundingClientRect(), t = document.createElement('div');
+  t.className = 'demo-toque'; t.style.left = (r.left + r.width / 2) + 'px'; t.style.top = (r.top + r.height / 2) + 'px';
+  document.body.appendChild(t); setTimeout(() => t.remove(), 800);
+}
+async function demoTocar(el) {
+  if (!el) return;
+  if (el.getBoundingClientRect && el.scrollIntoView && !(el.closest && el.closest('.pie, nav'))) {   // si está fuera de vista, se desplaza hasta ahí
+    const r = el.getBoundingClientRect(), alto = typeof innerHeight === 'number' ? innerHeight : 800;
+    if (r.top < 110 || r.bottom > alto - 140) { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); await pausaDemo(700); }
+  }
+  demoToque(el); await pausaDemo(450); el.click(); await pausaDemo(350);
+}
+function demoConfirmar(el) { if (el && el.dispatchEvent) el.dispatchEvent(new Event('change', { bubbles: true })); }   // como al salir del campo
+/* Cursor que parpadea al final de lo escrito (el teclado de Android no se abre, así que se dibuja uno) */
+function demoCursor(el, texto) {
+  let c = document.getElementById('demo-cursor');
+  if (!el || !el.getBoundingClientRect) { if (c) c.remove(); return; }
+  if (!c) { c = document.createElement('div'); c.id = 'demo-cursor'; document.body.appendChild(c); }
+  const r = el.getBoundingClientRect(), cs = getComputedStyle(el);
+  let ancho = 0;
+  try {
+    const g = (demoCursor.lienzo || (demoCursor.lienzo = document.createElement('canvas'))).getContext('2d');
+    g.font = cs.fontStyle + ' ' + cs.fontWeight + ' ' + cs.fontSize + ' ' + cs.fontFamily;
+    ancho = g.measureText(texto || '').width;
+  } catch (_) {}
+  const alto = (parseFloat(cs.fontSize) || 16) * 1.3;
+  c.style.left = (r.left + (parseFloat(cs.paddingLeft) || 0) + (parseFloat(cs.borderLeftWidth) || 0) + ancho) + 'px';
+  c.style.top = (r.top + r.height / 2 - alto / 2) + 'px';
+  c.style.height = alto + 'px';
+  c.style.background = cs.color || '#000';
+}
+async function demoEscribir(el, texto, ms, espera) {
+  if (!el) return;
+  el.value = '';
+  try {
+    demoCursor(el, '');
+    await pausaDemo(espera || 600);                            // el cursor parpadea un momento antes de escribir
+    for (const letra of texto) { el.value += letra; demoCursor(el, el.value); await pausaDemo(ms || 130); }
+    await pausaDemo(400);
+  } finally { demoCursor(null); }
+}
+async function demoCuenta() {
+  const c = document.createElement('div'); c.id = 'demo-cuenta'; document.body.appendChild(c);
+  try {
+    for (let n = 5; n >= 1; n--) {
+      c.innerHTML = '<div class="demo-aviso">Empezá a grabar la pantalla</div><div class="demo-num">' + n + '</div>' +
+        '<div class="demo-aviso" style="font-size:14px;font-weight:400">Para cortar: tocá 3 veces la pantalla</div>';
+      await pausaDemo(1000);
+    }
+  } finally { c.remove(); }
+}
+async function correrDemo() {
+  if (demoCorriendo || !S.demo) return;
+  demoCorriendo = true; demoCancelada = false;
+  const frases = S.demoFrases !== false;
+  S = estadoDemo(S); S.demoFrases = frases;                 // siempre arranca de los mismos datos de ejemplo
+  ajustarCuentasDemo();
+  S.ingresos = [{ cat: 'Sueldo', a: 0 }]; S.items = [];      // la introducción los carga sola
+  S.bienvenida = false; UI.paso = 0;                       // arranca en la pantalla de bienvenida
+  UI.pestana = 'hoy'; UI.borrador = {}; UI.categoria = ''; UI.editando = null;
+  guardar(); dibujar(); scrollTo(0, 0);
+  demoCapa(true);
+  try {
+    await demoCuenta();
+    const siguiente = async () => { await demoTocar(buscarDemo('.pie button[data-a="pasoSiguiente"]')); await pausaDemo(900); };
+    demoFrase('Dejé el Excel y armé mi propia app 📱');
+    await pausaDemo(3500); await siguiente();                    // Continuar →
+
+    demoFrase('Así funciona: tres pasos y listo');
+    await pausaDemo(5500); await siguiente();
+
+    demoFrase('Sin cuenta ni anuncios: tus datos quedan en tu celu');
+    await pausaDemo(5500); await siguiente();
+
+    demoFrase('Cargo lo que cobro');
+    await pausaDemo(1200);
+    const sueldo = buscarDemo('input[data-f="ingresoMonto"]');
+    await demoTocar(sueldo); await demoEscribir(sueldo, '620000', 130); demoConfirmar(sueldo);
+    await pausaDemo(3200); await siguiente();
+
+    demoFrase('Anoto lo que pago sí o sí');
+    await pausaDemo(1000);
+    for (const [nombre, monto] of [['Alquiler', '180000'], ['Luz', '25000'], ['Internet', '20000']]) {
+      await demoTocar(buscarDemo('button[data-a="agregarGasto"]'));
+      const k = S.items.length - 1;
+      if (S.items[k]) { S.items[k].d = ''; dibujar(); }          // en el demo corre desde el inicio del período
+      await pausaDemo(300);
+      const cNombre = buscarDemo('input[data-f="itemNombre"][data-k="' + k + '"]');
+      await demoTocar(cNombre); await demoEscribir(cNombre, nombre, 100, 350); demoConfirmar(cNombre);
+      const cMonto = buscarDemo('input[data-f="itemMonto"][data-k="' + k + '"]');
+      await demoTocar(cMonto); await demoEscribir(cMonto, monto, 120, 350); demoConfirmar(cMonto);
+      await pausaDemo(400);
+    }
+    scrollTo({ top: document.documentElement.scrollHeight || 9999, behavior: 'smooth' });   // muestra "Así queda tu mes"
+    await pausaDemo(4000); await siguiente();
+
+    demoFrase('Y la app me dice cuánto puedo gastar por día');
+    await pausaDemo(5000); await siguiente();                    // Empezar →
+    ajustarCuentasDemo(); guardar(); dibujar();
+
+    demoFrase('Anoto cada gasto en 5 segundos');
+    const tarjeta = buscarDemo('#tarjeta-anotar');
+    if (tarjeta && tarjeta.scrollIntoView) tarjeta.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    await pausaDemo(1000);
+    await demoTocar(buscarDemo('#am')); await demoEscribir(buscarDemo('#am'), '6500', 150);
+    await demoTocar(buscarDemo('#nt')); await demoEscribir(buscarDemo('#nt'), 'Almuerzo', 110);
+    await demoTocar(buscarDemo('button[data-a="categoria"][data-v="Comida"]'));
+    await pausaDemo(500);
+    await demoTocar(buscarDemo('#tarjeta-anotar button[data-a="anotar"]'));
+    await pausaDemo(600);
+    ajustarCuentasDemo(); guardar(); dibujar();
+
+    demoFrase('Sé cuánta plata me queda para hoy');
+    scrollTo({ top: 0, behavior: 'smooth' });
+    await pausaDemo(4000);
+
+    /* --- Lo que sobra hoy pasa a mañana, y si me paso se descuenta mañana --- */
+    const resaltarManana = async ms => {
+      const el = buscarDemo('#linea-manana');
+      if (el && el.scrollIntoView) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      await pausaDemo(900);
+      if (el) el.classList.add('demo-resalte');
+      await pausaDemo(ms);
+      if (el) el.classList.remove('demo-resalte');
+    };
+    demoFrase('Lo que no gasto hoy, pasa a mañana 👉');
+    await resaltarManana(5500);
+
+    demoFrase('¿Y si me paso hoy? Se descuenta de mañana');
+    const cB = calcular(S, hoyISO());
+    const exceso = Math.max(1000, Math.round((cB.quedaHoy + (cB.baseManana || 0) * 0.75) / 1000) * 1000);   // deja a mañana con poco
+    const tarjetaB = buscarDemo('#tarjeta-anotar');
+    if (tarjetaB && tarjetaB.scrollIntoView) tarjetaB.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    await pausaDemo(1000);
+    await demoTocar(buscarDemo('#am')); await demoEscribir(buscarDemo('#am'), String(exceso), 150);
+    await demoTocar(buscarDemo('#nt')); await demoEscribir(buscarDemo('#nt'), 'Cena', 110);
+    await demoTocar(buscarDemo('button[data-a="categoria"][data-v="Salidas"]'));
+    await pausaDemo(500);
+    await demoTocar(buscarDemo('#tarjeta-anotar button[data-a="anotar"]'));
+    await pausaDemo(600);
+    ajustarCuentasDemo(); guardar(); dibujar();
+    const gastoExtra = S.spent[S.spent.length - 1], idExceso = gastoExtra && gastoExtra.id;
+    await resaltarManana(6000);
+
+    demoFrase('Elijo cuánto gastar por día y veo cuánto ahorro');
+    await demoTocar(buscarDemo('nav button[data-t="dias"]'));
+    if (idExceso) { S.spent = S.spent.filter(x => x.id !== idExceso); ajustarCuentasDemo(); guardar(); dibujar(); }   // vuelve a los números de antes
+    await pausaDemo(800);
+    const campo = buscarDemo('input[data-f="objetivo"]');
+    await demoTocar(campo); await demoEscribir(campo, '12000', 160);
+    await pausaDemo(400);
+    if (campo) campo.dispatchEvent(new Event('change', { bubbles: true }));
+    await pausaDemo(5000);
+
+    demoFrase('Gratis 👉 link en mi bio');
+    await demoTocar(buscarDemo('nav button[data-t="hoy"]'));
+    await pausaDemo(4000);
+  } catch (e) {
+    if (!(e && e.message === DEMO_CORTADA)) console.error(e);
+  } finally {
+    const cortada = demoCancelada;
+    demoFrase(''); demoCapa(false); demoCursor(null);
+    const cuenta = document.getElementById('demo-cuenta'); if (cuenta) cuenta.remove();
+    demoCorriendo = false; demoCancelada = false;
+    S.bienvenida = true; UI.paso = 0; UI.pestana = 'hoy'; dibujar();
+    if (cortada) aviso('Demo cortada.');
+  }
+}
+
+/* Con el teclado abierto: se esconde la barra de abajo y, si se escribe en "Anotar gasto", la tarjeta
+   entera se lleva a la vista (monto, detalle, categorías, fecha y botón azul juntos, sobre el teclado). */
+(function () {
+  const esCampo = el => !!el && /^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName);
+  let temporizador = null;
+  document.addEventListener('focusin', e => {
+    if (!esCampo(e.target)) return;
+    clearTimeout(temporizador);
+    document.body.classList.add('teclado');
+    const tarjeta = e.target.closest && e.target.closest('#tarjeta-anotar');
+    if (tarjeta) [350, 800].forEach(demora => setTimeout(() => {   // dos intentos: el teclado tarda en abrirse
+      if (document.body.contains(tarjeta) && tarjeta.contains(document.activeElement)) tarjeta.scrollIntoView({ block: 'end', behavior: 'smooth' });
+    }, demora));
+  });
+  document.addEventListener('focusout', () => {
+    clearTimeout(temporizador);
+    temporizador = setTimeout(() => { if (!esCampo(document.activeElement)) document.body.classList.remove('teclado'); }, 300);
+  });
+  /* Si la pantalla se vuelve a dibujar con un campo enfocado (por ejemplo al confirmar un número con Enter),
+     el campo desaparece sin avisar: se revisa después de cada dibujo para que la barra de abajo no quede escondida. */
+  new MutationObserver(() => { if (!esCampo(document.activeElement)) document.body.classList.remove('teclado'); })
+    .observe(document.getElementById('m'), { childList: true });
+})();
+
+/* Lo llama la app de Android cuando se toca el "+" del widget (se ignora si ya se atendió ese pedido) */
+window.miplataAbrir = (accion, id) => {
+  if (id && window.__abrirId === id) return;
+  if (accion === 'anotar') { abrirAnotarGasto(); window.__abrirId = id; }
+};
+
+/* =====================================================================
+   10 · ARRANQUE — conecta todo y pone la app en marcha.
+   ===================================================================== */
+function cerrarDias(incluirHoy) {
+  if (congelarDias(S, hoyISO(), incluirHoy)) guardar();
+}
+function programarCierreNocturno() {      // 23:59:30 de cada día, si la app está abierta
+  const ahora = new Date();
+  let falta = new Date(ahora.getFullYear(), ahora.getMonth(), ahora.getDate(), 23, 59, 30) - ahora;
+  if (falta <= 0) falta += MS_DIA;
+  setTimeout(() => { cerrarDias(true); dibujar(); programarCierreNocturno(); }, falta);
+}
+
+function iniciar() {
+  const principal = document.getElementById('m');
+  document.querySelector('nav').onclick = e => {
+    const pestana = e.target.dataset.t;
+    if (pestana) { UI.pestana = pestana; dibujar(); scrollTo(0, 0); }
+  };
+  document.getElementById('fab').onclick = abrirAnotarGasto;
+  principal.onclick = alHacerClic;
+  principal.onchange = alHacerCambio;
+  principal.onkeydown = e => {
+    if (e.key === 'Enter' && e.target.id === 'pin') desbloquear();
+    if (e.key === 'Enter' && e.target.dataset && e.target.dataset.f === 'objetivo') e.target.blur();   // confirma el objetivo
+  };
+  matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => dibujar());
+  ['click', 'touchstart', 'keydown'].forEach(ev => document.addEventListener(ev, reiniciarInactividad, { passive: true }));
+  document.addEventListener('visibilitychange', alCambiarVisibilidad);
+
+  dibujar();
+  if (S.demo) aviso('Modo demo activo: son datos de ejemplo. Salí desde Ajustes.');
+  if (S.recOn) programarRecordatorio(false);
+  actualizarWidgetResumen();
+  iniciarNube().then(() => cerrarDias());
+  programarCierreNocturno();
+  reiniciarInactividad();
+  if (CONFIG.sw && 'serviceWorker' in navigator)
+    window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+}
+iniciar();
+
+</script></body></html>

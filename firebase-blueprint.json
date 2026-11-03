@@ -1,0 +1,92 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "User account profile and sync preferences",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "description": "Firebase Auth UID" },
+        "displayName": { "type": "string", "maxLength": 100 },
+        "email": { "type": "string", "maxLength": 150 },
+        "photoURL": { "type": "string", "maxLength": 500 },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["uid"]
+    },
+    "FinancialProfile": {
+      "title": "FinancialProfile",
+      "description": "User overall financial plan, budget, and E2EE encrypted blob or state",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "maxLength": 128 },
+        "periodStart": { "type": "string", "maxLength": 20 },
+        "periodEnd": { "type": "string", "maxLength": 20 },
+        "totalIncome": { "type": "number" },
+        "dailyBase": { "type": "number" },
+        "savingsFund": { "type": "number" },
+        "e2eeEnabled": { "type": "boolean" },
+        "encryptedData": { "type": "string", "maxLength": 500000 },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["userId"]
+    },
+    "ImportantBill": {
+      "title": "ImportantBill",
+      "description": "Critical recurring bill or debt with Mercado Pago payment integration",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 64 },
+        "userId": { "type": "string", "maxLength": 128 },
+        "name": { "type": "string", "maxLength": 100 },
+        "amount": { "type": "number" },
+        "dueDate": { "type": "string", "maxLength": 30 },
+        "isPaid": { "type": "boolean" },
+        "mpCategory": { "type": "string", "maxLength": 50 },
+        "mpPaymentLink": { "type": "string", "maxLength": 500 },
+        "mpAliasCbu": { "type": "string", "maxLength": 100 },
+        "barcode": { "type": "string", "maxLength": 100 },
+        "installmentsCurrent": { "type": "number" },
+        "installmentsTotal": { "type": "number" },
+        "isRecurring": { "type": "boolean" },
+        "isVariableAmount": { "type": "boolean" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["id", "userId", "name", "amount", "isPaid"]
+    },
+    "DailyExpense": {
+      "title": "DailyExpense",
+      "description": "Everyday expense logged by the user",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 64 },
+        "userId": { "type": "string", "maxLength": 128 },
+        "date": { "type": "string", "maxLength": 20 },
+        "amount": { "type": "number" },
+        "category": { "type": "string", "maxLength": 50 },
+        "note": { "type": "string", "maxLength": 200 },
+        "metaId": { "type": "string", "maxLength": 64 },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "userId", "date", "amount"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "UserProfile",
+      "description": "User profile information"
+    },
+    "/financial_profiles/{userId}": {
+      "schema": "FinancialProfile",
+      "description": "User financial profile, settings, and synchronized state"
+    },
+    "/financial_profiles/{userId}/bills/{billId}": {
+      "schema": "ImportantBill",
+      "description": "Important expenses and bills with Mercado Pago integration"
+    },
+    "/financial_profiles/{userId}/expenses/{expenseId}": {
+      "schema": "DailyExpense",
+      "description": "Daily expenses registered by the user"
+    }
+  }
+}
