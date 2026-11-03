@@ -1,0 +1,20 @@
+{
+  "appId": "com.miplata.app",
+  "appName": "Mi Plata",
+  "webDir": "dist",
+  "bundledWebRuntime": false,
+  "server": {
+    "androidScheme": "https",
+    "allowNavigation": [
+      "mercadopago://*",
+      "https://*.mercadopago.com.ar/*",
+      "https://*.mercadopago.com/*",
+      "https://*.firebaseapp.com/*",
+      "https://*.googleapis.com/*"
+    ]
+  },
+  "android": {
+    "allowMixedContent": true,
+    "captureInput": true
+  }
+}
