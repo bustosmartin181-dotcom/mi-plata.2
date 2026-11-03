@@ -18,13 +18,11 @@ jobs:
 
       - name: 2. Verificar y organizar archivos del proyecto
         run: |
-          # Si los archivos quedaron dentro de una subcarpeta al descomprimir, moverlos a la raíz
           if [ ! -f "package.json" ]; then
             FOUND_PKG=$(find . -maxdepth 3 -name "package.json" -not -path "./package.json" | head -n 1)
             if [ -n "$FOUND_PKG" ]; then
               SOURCE_DIR=$(dirname "$FOUND_PKG")
-              echo "Detectada subcarpeta con el proyecto en: $SOURCE_DIR"
-              echo "Moviendo archivos a la raíz para compilar..."
+              echo "Detectada subcarpeta: $SOURCE_DIR. Moviendo a la raíz..."
               cp -r "$SOURCE_DIR"/* . 2>/dev/null || true
               cp -r "$SOURCE_DIR"/.* . 2>/dev/null || true
             fi
@@ -32,11 +30,9 @@ jobs:
 
           if [ ! -f "package.json" ]; then
             echo "::error::❌ No se encontró el archivo package.json."
-            echo "Contenido actual de la raíz:"
-            ls -la
             exit 1
           fi
-          echo "✓ package.json encontrado y listo"
+          echo "✓ package.json listo"
 
       - name: 3. Configurar Node.js 20
         uses: actions/setup-node@v4
@@ -64,10 +60,11 @@ jobs:
 
       - name: 8. Sincronizar Capacitor Android
         run: |
+          npm install @capacitor/core @capacitor/cli @capacitor/android --legacy-peer-deps
           if [ ! -d "android" ]; then
-            npx cap add android
+            npx --yes @capacitor/cli add android
           fi
-          npx cap sync android
+          npx --yes @capacitor/cli sync android
 
       - name: 9. Compilar APK Android con Gradle
         run: |
