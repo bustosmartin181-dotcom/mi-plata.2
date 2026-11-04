@@ -1,16 +1,17 @@
 import React, { useState } from 'react';
 import { ExpenseItem } from '../types';
 import { pesos } from '../lib/calculator';
-import { launchMercadoPago } from '../lib/mercadopago';
+import { launchMercadoPago, getMercadoPagoActions } from '../lib/mercadopago';
 import { 
-  ExternalLink, 
   Copy, 
   Check, 
   ShieldCheck, 
   CheckCircle2, 
   X, 
   Search, 
-  Loader2 
+  Loader2,
+  ArrowUpRight,
+  Sparkles
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
@@ -55,6 +56,8 @@ export const MercadoPagoModal: React.FC<MercadoPagoModalProps> = ({
   const [buscandoFactura, setBuscandoFactura] = useState(false);
   const [resultadoBusqueda, setResultadoBusqueda] = useState<string | null>(null);
 
+  const mpAction = getMercadoPagoActions(bill);
+
   const copyToClipboard = (text: string, fieldName: string) => {
     navigator.clipboard.writeText(text);
     setCopiedField(fieldName);
@@ -62,16 +65,16 @@ export const MercadoPagoModal: React.FC<MercadoPagoModalProps> = ({
   };
 
   const handlePay = () => {
-    launchMercadoPago(bill, () => {});
+    launchMercadoPago(bill);
   };
 
   const handleConfirmPaid = () => {
     try {
       confetti({
-        particleCount: 80,
-        spread: 60,
+        particleCount: 70,
+        spread: 55,
         origin: { y: 0.65 },
-        colors: ['#009EE3', '#1B6B4A', '#25D366', '#FFD700'],
+        colors: ['#1B6B4A', '#009EE3', '#25D366'],
       });
     } catch (_) {}
 
@@ -101,7 +104,7 @@ export const MercadoPagoModal: React.FC<MercadoPagoModalProps> = ({
     setBuscandoFactura(true);
     setResultadoBusqueda(null);
 
-    await new Promise(r => setTimeout(r, 1200));
+    await new Promise(r => setTimeout(r, 1100));
 
     const suma = dniOIdentificador
       .split('')
@@ -127,60 +130,59 @@ export const MercadoPagoModal: React.FC<MercadoPagoModalProps> = ({
 
     onUpdateBill(facturaActualizada);
     setBuscandoFactura(false);
-    setResultadoBusqueda(`¡Factura encontrada! Vence el ${fechaStr}`);
+    setResultadoBusqueda(`Factura detectada: vence el ${fechaStr}`);
     setTimeout(() => {
       setModoBusquedaDNI(false);
       setResultadoBusqueda(null);
-    }, 1800);
+    }, 1600);
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 overflow-y-auto">
-      <div className="w-full max-w-sm rounded-3xl bg-white dark:bg-[#1A211D] p-5 shadow-2xl border border-[#E5DFD6] dark:border-[#2A332E] relative my-auto animate-in fade-in zoom-in-95 duration-150">
-        {/* Botón Cerrar */}
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-md p-4 overflow-y-auto">
+      <div className="w-full max-w-sm rounded-[28px] bg-white dark:bg-[#181E1A] p-6 shadow-2xl border border-[#EDE8E0] dark:border-[#263029] relative my-auto animate-in fade-in zoom-in-95 duration-150">
+        
+        {/* Botón Cerrar discreto */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 p-1.5 rounded-full text-[#6B756F] hover:bg-[#EDE8E0] dark:text-[#9AA59D] dark:hover:bg-[#1C221F] transition"
+          className="absolute top-5 right-5 p-1.5 rounded-full text-[#8C9690] hover:bg-[#F3EFEA] dark:hover:bg-[#222A24] transition"
         >
-          <X className="w-5 h-5" />
+          <X className="w-4 h-4" />
         </button>
 
-        {/* Header Mercado Pago */}
-        <div className="flex items-center gap-3 mb-4">
-          <div className="w-12 h-12 rounded-2xl bg-[#009EE3]/15 flex items-center justify-center text-[#009EE3]">
-            <span className="font-display font-extrabold text-xl text-[#009EE3]">MP</span>
+        {/* Encabezado elegante con etiqueta Mercado Pago miniatura */}
+        <div className="mb-5">
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#009EE3]/10 dark:bg-[#009EE3]/15 text-[#0089C7] dark:text-[#38BDF8] text-[10px] font-semibold tracking-wide uppercase mb-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#009EE3] animate-pulse"></span>
+            Mercado Pago
           </div>
-          <div>
-            <span className="text-[11px] font-bold uppercase tracking-wider text-[#009EE3]">
-              Mercado Pago Facturas
-            </span>
-            <h2 className="font-display font-bold text-xl text-[#1A1F1C] dark:text-[#F0F2F0] leading-tight">
-              {bill.n || 'Gasto Importante'}
-            </h2>
-          </div>
+          <h2 className="font-display font-bold text-2xl text-[#1A1F1C] dark:text-[#F0F2F0] leading-tight">
+            {bill.n || 'Gasto'}
+          </h2>
         </div>
 
-        {/* VISTA 1: BÚSQUEDA AUTOMÁTICA POR DNI */}
         {modoBusquedaDNI ? (
+          /* MODO BUSCADOR DNI */
           <div className="space-y-3 mb-4 animate-in fade-in duration-200">
-            <div className="bg-[#009EE3]/10 dark:bg-[#009EE3]/20 p-3 rounded-2xl border border-[#009EE3]/30">
-              <span className="text-xs font-bold text-[#009EE3] flex items-center gap-1.5 mb-1">
-                <Search className="w-4 h-4" /> Buscar factura por DNI
+            <div className="bg-[#F5F2EC] dark:bg-[#1E2520] p-3 rounded-2xl border border-[#E5DFD6] dark:border-[#2C372F]">
+              <span className="text-xs font-semibold text-[#1A1F1C] dark:text-[#E2E8F0] flex items-center gap-1.5 mb-0.5">
+                <Search className="w-3.5 h-3.5 text-[#1B6B4A]" /> Consulta directa por DNI
               </span>
-              <p className="text-[11px] text-[#555] dark:text-[#AAA]">
-                Ingresá tu DNI o número de cliente para detectar la factura automáticamente.
+              <p className="text-[11px] text-[#717A74] dark:text-[#8E9991]">
+                Buscamos el importe y vencimiento en la red de cobros.
               </p>
             </div>
 
             <div>
-              <label className="text-xs text-[#6B756F] dark:text-[#9AA59D] block mb-1">Empresa</label>
+              <label className="text-[11px] font-medium text-[#717A74] dark:text-[#8E9991] block mb-1">
+                Servicio
+              </label>
               <select
                 value={empresaSeleccionada.id}
                 onChange={e => {
                   const emp = EMPRESAS_SERVICIO.find(s => s.id === e.target.value);
                   if (emp) setEmpresaSeleccionada(emp);
                 }}
-                className="w-full text-sm p-2 rounded-xl border border-[#E5DFD6] dark:border-[#2A332E] bg-[#F5F1EB] dark:bg-[#121614] text-[#1A1F1C] dark:text-[#F0F2F0]"
+                className="w-full text-xs p-2.5 rounded-xl border border-[#E5DFD6] dark:border-[#2A332E] bg-[#FAFAF8] dark:bg-[#121614] text-[#1A1F1C] dark:text-[#F0F2F0] focus:outline-none"
               >
                 {EMPRESAS_SERVICIO.map(emp => (
                   <option key={emp.id} value={emp.id}>
@@ -191,7 +193,7 @@ export const MercadoPagoModal: React.FC<MercadoPagoModalProps> = ({
             </div>
 
             <div>
-              <label className="text-xs text-[#6B756F] dark:text-[#9AA59D] block mb-1">
+              <label className="text-[11px] font-medium text-[#717A74] dark:text-[#8E9991] block mb-1">
                 {empresaSeleccionada.tipo} del titular
               </label>
               <input
@@ -199,21 +201,21 @@ export const MercadoPagoModal: React.FC<MercadoPagoModalProps> = ({
                 placeholder={empresaSeleccionada.placeholder}
                 value={dniOIdentificador}
                 onChange={e => setDniOIdentificador(e.target.value)}
-                className="w-full text-sm p-2 rounded-xl border border-[#E5DFD6] dark:border-[#2A332E] bg-[#F5F1EB] dark:bg-[#121614] text-[#1A1F1C] dark:text-[#F0F2F0]"
+                className="w-full text-xs p-2.5 rounded-xl border border-[#E5DFD6] dark:border-[#2A332E] bg-[#FAFAF8] dark:bg-[#121614] text-[#1A1F1C] dark:text-[#F0F2F0] focus:outline-none"
               />
             </div>
 
             {resultadoBusqueda && (
-              <div className="p-2 text-center text-xs bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 rounded-xl font-medium">
+              <div className="p-2 text-center text-xs bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 rounded-xl font-medium border border-emerald-200/50">
                 {resultadoBusqueda}
               </div>
             )}
 
-            <div className="flex gap-2 pt-2">
+            <div className="flex gap-2 pt-1">
               <button
                 type="button"
                 onClick={() => setModoBusquedaDNI(false)}
-                className="flex-1 py-2 rounded-xl border border-[#E5DFD6] dark:border-[#2A332E] text-xs font-semibold"
+                className="flex-1 py-2 rounded-xl border border-[#E5DFD6] dark:border-[#2A332E] text-xs font-semibold text-[#555] dark:text-[#AAA]"
               >
                 Cancelar
               </button>
@@ -221,7 +223,7 @@ export const MercadoPagoModal: React.FC<MercadoPagoModalProps> = ({
                 type="button"
                 onClick={handleConsultarPorDNI}
                 disabled={buscandoFactura || !dniOIdentificador.trim()}
-                className="flex-1 py-2 rounded-xl bg-[#009EE3] text-white text-xs font-semibold flex items-center justify-center gap-1.5 disabled:opacity-50"
+                className="flex-1 py-2 rounded-xl bg-[#1B6B4A] text-white text-xs font-semibold flex items-center justify-center gap-1.5 disabled:opacity-50"
               >
                 {buscandoFactura ? (
                   <>
@@ -229,64 +231,52 @@ export const MercadoPagoModal: React.FC<MercadoPagoModalProps> = ({
                   </>
                 ) : (
                   <>
-                    <Search className="w-3.5 h-3.5" /> Buscar Factura
+                    <Search className="w-3.5 h-3.5" /> Consultar
                   </>
                 )}
               </button>
             </div>
           </div>
         ) : editing ? (
-          /* VISTA 2: EDICIÓN MANUAL */
+          /* MODO EDICIÓN MANUAL */
           <div className="space-y-3 mb-4">
             <div>
-              <label className="text-xs text-[#6B756F] dark:text-[#9AA59D] block mb-1">Nombre</label>
+              <label className="text-xs text-[#717A74] dark:text-[#8E9991] block mb-1">Nombre</label>
               <input
                 type="text"
                 value={name}
                 onChange={e => setName(e.target.value)}
-                className="w-full text-sm p-2 rounded-xl border border-[#E5DFD6] dark:border-[#2A332E] bg-[#F5F1EB] dark:bg-[#121614] text-[#1A1F1C] dark:text-[#F0F2F0]"
+                className="w-full text-xs p-2.5 rounded-xl border border-[#E5DFD6] dark:border-[#2A332E] bg-[#FAFAF8] dark:bg-[#121614] text-[#1A1F1C] dark:text-[#F0F2F0]"
               />
             </div>
             <div>
-              <label className="text-xs text-[#6B756F] dark:text-[#9AA59D] block mb-1">Monto ($)</label>
+              <label className="text-xs text-[#717A74] dark:text-[#8E9991] block mb-1">Monto ($)</label>
               <input
                 type="text"
                 value={amount}
                 onChange={e => setAmount(e.target.value)}
-                className="w-full text-sm p-2 rounded-xl border border-[#E5DFD6] dark:border-[#2A332E] bg-[#F5F1EB] dark:bg-[#121614] text-[#1A1F1C] dark:text-[#F0F2F0]"
+                className="w-full text-xs p-2.5 rounded-xl border border-[#E5DFD6] dark:border-[#2A332E] bg-[#FAFAF8] dark:bg-[#121614] text-[#1A1F1C] dark:text-[#F0F2F0]"
               />
             </div>
             <div>
-              <label className="text-xs text-[#6B756F] dark:text-[#9AA59D] block mb-1">Código de Barra / Factura</label>
+              <label className="text-xs text-[#717A74] dark:text-[#8E9991] block mb-1">Código de Barra / Factura</label>
               <input
                 type="text"
-                placeholder="Número de factura o código de barra"
                 value={barcode}
                 onChange={e => setBarcode(e.target.value)}
-                className="w-full text-sm p-2 rounded-xl border border-[#E5DFD6] dark:border-[#2A332E] bg-[#F5F1EB] dark:bg-[#121614] text-[#1A1F1C] dark:text-[#F0F2F0]"
+                className="w-full text-xs p-2.5 rounded-xl border border-[#E5DFD6] dark:border-[#2A332E] bg-[#FAFAF8] dark:bg-[#121614] text-[#1A1F1C] dark:text-[#F0F2F0]"
               />
             </div>
             <div>
-              <label className="text-xs text-[#6B756F] dark:text-[#9AA59D] block mb-1">Alias / CVU / CBU para transferir</label>
+              <label className="text-xs text-[#717A74] dark:text-[#8E9991] block mb-1">Alias / CVU / CBU</label>
               <input
                 type="text"
-                placeholder="ej: telecom.personal.mp"
                 value={alias}
                 onChange={e => setAlias(e.target.value)}
-                className="w-full text-sm p-2 rounded-xl border border-[#E5DFD6] dark:border-[#2A332E] bg-[#F5F1EB] dark:bg-[#121614] text-[#1A1F1C] dark:text-[#F0F2F0]"
+                className="w-full text-xs p-2.5 rounded-xl border border-[#E5DFD6] dark:border-[#2A332E] bg-[#FAFAF8] dark:bg-[#121614] text-[#1A1F1C] dark:text-[#F0F2F0]"
               />
             </div>
-            <div>
-              <label className="text-xs text-[#6B756F] dark:text-[#9AA59D] block mb-1">Link de pago directo (opcional)</label>
-              <input
-                type="url"
-                placeholder="https://mpago.la/..."
-                value={link}
-                onChange={e => setLink(e.target.value)}
-                className="w-full text-sm p-2 rounded-xl border border-[#E5DFD6] dark:border-[#2A332E] bg-[#F5F1EB] dark:bg-[#121614] text-[#1A1F1C] dark:text-[#F0F2F0]"
-              />
-            </div>
-            <div className="flex gap-2 pt-2">
+            <div className="flex gap-2 pt-1">
               <button
                 onClick={() => setEditing(false)}
                 className="flex-1 py-2 rounded-xl border border-[#E5DFD6] dark:border-[#2A332E] text-xs font-semibold"
@@ -302,54 +292,56 @@ export const MercadoPagoModal: React.FC<MercadoPagoModalProps> = ({
             </div>
           </div>
         ) : (
-          /* VISTA 3: VISTA PRINCIPAL */
+          /* VISTA PRINCIPAL CON DISEÑO REFINADO */
           <>
-            <div className="bg-[#E6F2EC] dark:bg-[#1E3328] rounded-2xl p-4 mb-3 text-center">
-              <span className="text-xs text-[#1B6B4A] dark:text-[#3D9B6E] font-medium block">
+            {/* Tarjeta de Importe Estilo Minimalista */}
+            <div className="bg-[#FAF8F5] dark:bg-[#1F2722] rounded-2xl p-4 mb-4 border border-[#EDE7DF] dark:border-[#2C3830] text-center">
+              <span className="text-[11px] font-semibold uppercase tracking-wider text-[#717A74] dark:text-[#8E9991] block">
                 Total a pagar
               </span>
-              <div className="font-display font-extrabold text-3xl text-[#1B6B4A] dark:text-[#3D9B6E] mt-0.5">
+              <div className="font-display font-extrabold text-3xl text-[#1B6B4A] dark:text-[#3D9B6E] tracking-tight my-1">
                 {pesos(bill.a)}
               </div>
-              <div className="flex items-center justify-center gap-2 mt-2">
+              <div className="flex items-center justify-center gap-2 mt-1.5">
                 <span
-                  className={`inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full ${
+                  className={`inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full ${
                     bill.p
-                      ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300'
-                      : 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300'
+                      ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300'
+                      : 'bg-amber-100/80 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300'
                   }`}
                 >
-                  {bill.p ? '✓ Ya pagado' : '⏳ Pendiente de pago'}
+                  {bill.p ? '✓ Pagado' : '⏳ Pendiente'}
                 </span>
                 {bill.dueDate && (
-                  <span className="text-[11px] text-[#6B756F] dark:text-[#9AA59D]">
-                    Vence: {bill.dueDate}
+                  <span className="text-[10px] text-[#717A74] dark:text-[#8E9991]">
+                    Vence {bill.dueDate}
                   </span>
                 )}
               </div>
             </div>
 
-            {/* BOTÓN NUEVO: BUSCAR POR DNI */}
+            {/* Botón sutil para buscar factura por DNI */}
             <button
               onClick={() => setModoBusquedaDNI(true)}
-              className="w-full mb-3 py-2 px-3 rounded-xl bg-[#009EE3]/10 hover:bg-[#009EE3]/20 border border-[#009EE3]/30 text-[#009EE3] text-xs font-bold flex items-center justify-center gap-1.5 transition"
+              className="w-full mb-3 py-2 px-3 rounded-xl bg-[#F5F2EC] hover:bg-[#EFEAE2] dark:bg-[#202722] dark:hover:bg-[#263029] border border-[#E5DFD6] dark:border-[#2C3830] text-[#47524A] dark:text-[#B2BCB4] text-[11px] font-semibold flex items-center justify-center gap-1.5 transition"
             >
-              <Search className="w-3.5 h-3.5" />
-              <span>Buscar factura por DNI (Telecom, Edenor, etc.)</span>
+              <Search className="w-3.5 h-3.5 text-[#1B6B4A]" />
+              <span>Autocompletar factura por DNI</span>
             </button>
 
-            {(bill.barcode || bill.mpAlias || bill.mpLink) && (
-              <div className="space-y-2 mb-4 bg-[#F5F1EB] dark:bg-[#121614] p-3 rounded-2xl border border-[#E5DFD6] dark:border-[#2A332E]">
-                {bill.barcode && (
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="text-[#6B756F] dark:text-[#9AA59D] truncate max-w-[170px]">
-                      Código: {bill.barcode}
+            {/* Datos copiables (Alias / Código) */}
+            {(bill.barcode || bill.mpAlias) && (
+              <div className="space-y-1.5 mb-4">
+                {bill.mpAlias && (
+                  <div className="flex items-center justify-between text-xs bg-[#FAF8F5] dark:bg-[#1E2520] px-3 py-2 rounded-xl border border-[#EDE7DF] dark:border-[#2A332E]">
+                    <span className="text-[#555] dark:text-[#AAA] truncate text-[11px]">
+                      Alias: <strong className="text-[#1A1F1C] dark:text-[#F0F2F0]">{bill.mpAlias}</strong>
                     </span>
                     <button
-                      onClick={() => copyToClipboard(bill.barcode!, 'barcode')}
-                      className="flex items-center gap-1 px-2 py-1 rounded-lg bg-white dark:bg-[#1A211D] text-[11px] font-semibold border border-[#E5DFD6] dark:border-[#2A332E]"
+                      onClick={() => copyToClipboard(bill.mpAlias!, 'alias')}
+                      className="flex items-center gap-1 text-[10px] font-bold text-[#1B6B4A] hover:underline"
                     >
-                      {copiedField === 'barcode' ? (
+                      {copiedField === 'alias' ? (
                         <>
                           <Check className="w-3 h-3 text-emerald-600" /> Copiado
                         </>
@@ -362,16 +354,16 @@ export const MercadoPagoModal: React.FC<MercadoPagoModalProps> = ({
                   </div>
                 )}
 
-                {bill.mpAlias && (
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="text-[#6B756F] dark:text-[#9AA59D] truncate max-w-[170px]">
-                      Alias: {bill.mpAlias}
+                {bill.barcode && (
+                  <div className="flex items-center justify-between text-xs bg-[#FAF8F5] dark:bg-[#1E2520] px-3 py-2 rounded-xl border border-[#EDE7DF] dark:border-[#2A332E]">
+                    <span className="text-[#555] dark:text-[#AAA] truncate text-[11px] max-w-[200px]">
+                      Cód: {bill.barcode}
                     </span>
                     <button
-                      onClick={() => copyToClipboard(bill.mpAlias!, 'alias')}
-                      className="flex items-center gap-1 px-2 py-1 rounded-lg bg-white dark:bg-[#1A211D] text-[11px] font-semibold border border-[#E5DFD6] dark:border-[#2A332E]"
+                      onClick={() => copyToClipboard(bill.barcode!, 'barcode')}
+                      className="flex items-center gap-1 text-[10px] font-bold text-[#1B6B4A] hover:underline"
                     >
-                      {copiedField === 'alias' ? (
+                      {copiedField === 'barcode' ? (
                         <>
                           <Check className="w-3 h-3 text-emerald-600" /> Copiado
                         </>
@@ -386,37 +378,45 @@ export const MercadoPagoModal: React.FC<MercadoPagoModalProps> = ({
               </div>
             )}
 
-            {/* BOTONES DE PAGO */}
+            {/* BOTÓN PRINCIPAL REDISEÑADO: ELEGANTE, OSCURO Y CON LOGO MP DISCRETO */}
             <div className="space-y-2 mb-4">
               <button
                 onClick={handlePay}
-                className="w-full py-3 px-4 rounded-2xl bg-[#009EE3] hover:bg-[#0089C7] text-white font-bold text-sm flex items-center justify-center gap-2 shadow-lg shadow-[#009EE3]/30 transition transform active:scale-95"
+                className="w-full py-3 px-4 rounded-2xl bg-[#1A1F1C] hover:bg-[#252D28] dark:bg-[#F0F2F0] dark:hover:bg-white text-white dark:text-[#1A1F1C] font-semibold text-xs flex items-center justify-between shadow-lg shadow-black/10 transition transform active:scale-95"
               >
-                <span>Derivar a Mercado Pago</span>
-                <ExternalLink className="w-4 h-4" />
+                {/* Logo miniatura discreto */}
+                <div className="flex items-center gap-2">
+                  <div className="w-5 h-5 rounded-full bg-[#009EE3]/20 flex items-center justify-center">
+                    <span className="text-[9px] font-black text-[#009EE3]">MP</span>
+                  </div>
+                  <span>{mpAction.text}</span>
+                </div>
+                <ArrowUpRight className="w-4 h-4 opacity-70" />
               </button>
 
+              {/* Botón Marcar Pagado */}
               <button
                 onClick={handleConfirmPaid}
                 className={`w-full py-2.5 px-4 rounded-2xl text-xs font-semibold flex items-center justify-center gap-1.5 transition ${
                   bill.p
-                    ? 'border border-[#E5DFD6] dark:border-[#2A332E] text-[#6B756F] dark:text-[#9AA59D]'
-                    : 'bg-[#1B6B4A] hover:bg-[#145238] text-white'
+                    ? 'border border-[#EDE7DF] dark:border-[#2A332E] text-[#8C9690]'
+                    : 'bg-[#1B6B4A] hover:bg-[#145238] text-white shadow-md shadow-[#1B6B4A]/20'
                 }`}
               >
-                <CheckCircle2 className="w-4 h-4" />
-                <span>{bill.p ? 'Marcar como pendiente' : 'Ya lo pagué (marcar como pagado)'}</span>
+                <CheckCircle2 className="w-3.5 h-3.5" />
+                <span>{bill.p ? 'Marcar como pendiente' : 'Marcar como pagado'}</span>
               </button>
             </div>
 
-            <div className="flex items-center justify-between pt-2 border-t border-[#E5DFD6] dark:border-[#2A332E] text-xs">
+            {/* Pie con opciones */}
+            <div className="flex items-center justify-between pt-2 border-t border-[#EDE7DF] dark:border-[#263029] text-[11px]">
               <button
                 onClick={() => setEditing(true)}
-                className="text-[#1B6B4A] dark:text-[#3D9B6E] font-medium hover:underline"
+                className="text-[#717A74] hover:text-[#1A1F1C] dark:hover:text-[#F0F2F0] font-medium transition"
               >
-                Editar código de barra o alias
+                Editar datos manuales
               </button>
-              <span className="text-[11px] text-[#6B756F] dark:text-[#9AA59D] flex items-center gap-1">
+              <span className="text-[#8C9690] flex items-center gap-1">
                 <ShieldCheck className="w-3 h-3 text-emerald-600" /> Seguro
               </span>
             </div>
