@@ -1,8 +1,5 @@
+@'
 import { ExpenseItem } from '../types';
-
-/**
- * Mercado Pago deep link and bill payment router
- */
 
 export interface MPPaymentOption {
   type: 'deep_link' | 'web' | 'alias' | 'barcode' | 'service';
@@ -12,43 +9,47 @@ export interface MPPaymentOption {
 }
 
 export const COMMON_SERVICES = [
-  { name: 'Edenor', category: 'Luz', code: 'edenor' },
-  { name: 'Edesur', category: 'Luz', code: 'edesur' },
-  { name: 'Metrogas', category: 'Gas', code: 'metrogas' },
-  { name: 'Naturgy', category: 'Gas', code: 'naturgy' },
-  { name: 'AySA', category: 'Agua', code: 'aysa' },
-  { name: 'Telecom / Personal / Flow', category: 'Internet', code: 'personal' },
-  { name: 'Claro', category: 'Telefonía', code: 'claro' },
-  { name: 'Movistar', category: 'Telefonía', code: 'movistar' },
-  { name: 'Telecentro', category: 'Internet', code: 'telecentro' },
-  { name: 'ARBA / Rentas', category: 'Impuestos', code: 'arba' },
-  { name: 'AFIP / Monotributo', category: 'Impuestos', code: 'afip' },
-  { name: 'Expensas', category: 'Vivienda', code: 'expensas' },
+  { name: 'Edenor', category: 'Luz', code: 'edenor', webUrl: 'https://pago.edenordigital.com/' },
+  { name: 'Edesur', category: 'Luz', code: 'edesur', webUrl: 'https://www.edesur.com.ar/' },
+  { name: 'Metrogas', category: 'Gas', code: 'metrogas', webUrl: 'https://pagos.metrogas.com.ar/' },
+  { name: 'Naturgy', category: 'Gas', code: 'naturgy', webUrl: 'https://www.naturgy.com.ar/' },
+  { name: 'AySA', category: 'Agua', code: 'aysa', webUrl: 'https://www.aysa.com.ar/' },
+  { name: 'Telecom / Personal / Flow', category: 'Internet', code: 'personal', webUrl: 'https://www.personal.com.ar/pagar' },
+  { name: 'Claro', category: 'Telefonía', code: 'claro', webUrl: 'https://www.claro.com.ar/' },
+  { name: 'Movistar', category: 'Telefonía', code: 'movistar', webUrl: 'https://www.movistar.com.ar/' },
+  { name: 'Telecentro', category: 'Internet', code: 'telecentro', webUrl: 'https://telecentro.com.ar/' },
+  { name: 'ARBA / Rentas', category: 'Impuestos', code: 'arba', webUrl: 'https://www.arba.gov.ar/' },
+  { name: 'AFIP / Monotributo', category: 'Impuestos', code: 'afip', webUrl: 'https://www.afip.gob.ar/' },
+  { name: 'Expensas', category: 'Vivienda', code: 'expensas', webUrl: 'https://www.mercadopago.com.ar/' },
 ];
 
 /**
- * Creates optimal links for paying a bill in Mercado Pago
+ * Genera enlaces óptimos evitando errores 404 en la web de Mercado Pago
  */
 export function getMercadoPagoActions(item: ExpenseItem) {
   const isMobile = typeof navigator !== 'undefined' && /android|iphone|ipad|ipod/i.test(navigator.userAgent);
 
-  // 1. If explicit checkout/payment link exists
+  // 1. Si tiene link de pago directo personalizado
   if (item.mpLink && item.mpLink.trim().startsWith('http')) {
     return {
-      primaryActionText: 'Abrir pago en Mercado Pago',
+      primaryActionText: 'Abrir enlace de pago',
       primaryUrl: item.mpLink.trim(),
       type: 'custom_link',
       isApp: false,
     };
   }
 
-  // 2. Mobile Deep Link vs Web Link
-  // On mobile devices, attempts to launch Mercado Pago native app; fallbacks seamlessly to web
+  // 2. Si coincide con alguna empresa conocida (ej: Telecom Personal)
+  const billNameLower = (item.n || '').toLowerCase();
+  const matchedService = COMMON_SERVICES.find(s => 
+    billNameLower.includes(s.code) || billNameLower.includes(s.name.toLowerCase())
+  );
+
   const appDeepLink = 'mercadopago://services/pay';
-  const webServicesUrl = 'https://www.mercadopago.com.ar/services';
+  const webServicesUrl = matchedService?.webUrl || 'https://www.mercadopago.com.ar/';
 
   return {
-    primaryActionText: isMobile ? 'Pagar en Mercado Pago App' : 'Abrir Mercado Pago',
+    primaryActionText: isMobile ? 'Pagar en Mercado Pago App' : 'Abrir portal de pago',
     primaryUrl: isMobile ? appDeepLink : webServicesUrl,
     fallbackUrl: webServicesUrl,
     type: 'services_hub',
@@ -57,13 +58,13 @@ export function getMercadoPagoActions(item: ExpenseItem) {
 }
 
 /**
- * Triggers payment redirection to Mercado Pago
+ * Dispara la redirección sin romper la navegación
  */
 export async function launchMercadoPago(item: ExpenseItem, onSuccess?: () => void) {
   const isMobile = typeof navigator !== 'undefined' && /android|iphone|ipad|ipod/i.test(navigator.userAgent);
   const actions = getMercadoPagoActions(item);
 
-  // If there's a barcode or alias, copy it first so the user can easily paste inside Mercado Pago
+  // Copia el código de barra o alias al portapapeles automáticamente
   if (item.barcode) {
     try {
       await navigator.clipboard.writeText(item.barcode);
@@ -75,11 +76,9 @@ export async function launchMercadoPago(item: ExpenseItem, onSuccess?: () => voi
   }
 
   if (isMobile && actions.isApp) {
-    // Attempt deep link launch
     const start = Date.now();
     window.location.href = actions.primaryUrl;
 
-    // Fallback if app is not installed
     setTimeout(() => {
       if (Date.now() - start < 1500) {
         window.open(actions.fallbackUrl, '_blank', 'noopener,noreferrer');
@@ -93,3 +92,4 @@ export async function launchMercadoPago(item: ExpenseItem, onSuccess?: () => voi
     onSuccess();
   }
 }
+'@ | Out-File -FilePath "src\lib\mercadopago.ts" -Encoding utf8
