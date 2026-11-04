@@ -10,8 +10,7 @@ import {
   X, 
   Search, 
   Loader2,
-  ArrowUpRight,
-  Sparkles
+  ArrowUpRight
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
@@ -42,7 +41,6 @@ export const MercadoPagoModal: React.FC<MercadoPagoModalProps> = ({
   const [editing, setEditing] = useState(false);
   const [modoBusquedaDNI, setModoBusquedaDNI] = useState(false);
 
-  // Estados del formulario
   const [name, setName] = useState(bill.n);
   const [amount, setAmount] = useState(bill.a.toString());
   const [barcode, setBarcode] = useState(bill.barcode || '');
@@ -50,7 +48,6 @@ export const MercadoPagoModal: React.FC<MercadoPagoModalProps> = ({
   const [link, setLink] = useState(bill.mpLink || '');
   const [category, setCategory] = useState(bill.mpCategory || 'Servicios');
 
-  // Estados de búsqueda por DNI
   const [empresaSeleccionada, setEmpresaSeleccionada] = useState(EMPRESAS_SERVICIO[0]);
   const [dniOIdentificador, setDniOIdentificador] = useState('');
   const [buscandoFactura, setBuscandoFactura] = useState(false);
@@ -64,7 +61,8 @@ export const MercadoPagoModal: React.FC<MercadoPagoModalProps> = ({
     setTimeout(() => setCopiedField(null), 2000);
   };
 
-  const handlePay = () => {
+  const handlePay = (e: React.MouseEvent) => {
+    e.preventDefault();
     launchMercadoPago(bill);
   };
 
@@ -141,7 +139,7 @@ export const MercadoPagoModal: React.FC<MercadoPagoModalProps> = ({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-md p-4 overflow-y-auto">
       <div className="w-full max-w-sm rounded-[28px] bg-white dark:bg-[#181E1A] p-6 shadow-2xl border border-[#EDE8E0] dark:border-[#263029] relative my-auto animate-in fade-in zoom-in-95 duration-150">
         
-        {/* Botón Cerrar discreto */}
+        {/* Botón Cerrar */}
         <button
           onClick={onClose}
           className="absolute top-5 right-5 p-1.5 rounded-full text-[#8C9690] hover:bg-[#F3EFEA] dark:hover:bg-[#222A24] transition"
@@ -149,10 +147,10 @@ export const MercadoPagoModal: React.FC<MercadoPagoModalProps> = ({
           <X className="w-4 h-4" />
         </button>
 
-        {/* Encabezado elegante con etiqueta Mercado Pago miniatura */}
+        {/* Encabezado elegante con etiqueta sutil */}
         <div className="mb-5">
           <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#009EE3]/10 dark:bg-[#009EE3]/15 text-[#0089C7] dark:text-[#38BDF8] text-[10px] font-semibold tracking-wide uppercase mb-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#009EE3] animate-pulse"></span>
+            <span className="w-1.5 h-1.5 rounded-full bg-[#009EE3]"></span>
             Mercado Pago
           </div>
           <h2 className="font-display font-bold text-2xl text-[#1A1F1C] dark:text-[#F0F2F0] leading-tight">
@@ -294,7 +292,7 @@ export const MercadoPagoModal: React.FC<MercadoPagoModalProps> = ({
         ) : (
           /* VISTA PRINCIPAL CON DISEÑO REFINADO */
           <>
-            {/* Tarjeta de Importe Estilo Minimalista */}
+            {/* Tarjeta de Importe */}
             <div className="bg-[#FAF8F5] dark:bg-[#1F2722] rounded-2xl p-4 mb-4 border border-[#EDE7DF] dark:border-[#2C3830] text-center">
               <span className="text-[11px] font-semibold uppercase tracking-wider text-[#717A74] dark:text-[#8E9991] block">
                 Total a pagar
@@ -320,7 +318,7 @@ export const MercadoPagoModal: React.FC<MercadoPagoModalProps> = ({
               </div>
             </div>
 
-            {/* Botón sutil para buscar factura por DNI */}
+            {/* Botón sutil DNI */}
             <button
               onClick={() => setModoBusquedaDNI(true)}
               className="w-full mb-3 py-2 px-3 rounded-xl bg-[#F5F2EC] hover:bg-[#EFEAE2] dark:bg-[#202722] dark:hover:bg-[#263029] border border-[#E5DFD6] dark:border-[#2C3830] text-[#47524A] dark:text-[#B2BCB4] text-[11px] font-semibold flex items-center justify-center gap-1.5 transition"
@@ -329,7 +327,7 @@ export const MercadoPagoModal: React.FC<MercadoPagoModalProps> = ({
               <span>Autocompletar factura por DNI</span>
             </button>
 
-            {/* Datos copiables (Alias / Código) */}
+            {/* Datos copiables */}
             {(bill.barcode || bill.mpAlias) && (
               <div className="space-y-1.5 mb-4">
                 {bill.mpAlias && (
@@ -378,13 +376,13 @@ export const MercadoPagoModal: React.FC<MercadoPagoModalProps> = ({
               </div>
             )}
 
-            {/* BOTÓN PRINCIPAL REDISEÑADO: ELEGANTE, OSCURO Y CON LOGO MP DISCRETO */}
+            {/* BOTÓN PRINCIPAL */}
             <div className="space-y-2 mb-4">
-              <button
+              <a
+                href={mpAction.url}
                 onClick={handlePay}
-                className="w-full py-3 px-4 rounded-2xl bg-[#1A1F1C] hover:bg-[#252D28] dark:bg-[#F0F2F0] dark:hover:bg-white text-white dark:text-[#1A1F1C] font-semibold text-xs flex items-center justify-between shadow-lg shadow-black/10 transition transform active:scale-95"
+                className="w-full py-3 px-4 rounded-2xl bg-[#1A1F1C] hover:bg-[#252D28] dark:bg-[#F0F2F0] dark:hover:bg-white text-white dark:text-[#1A1F1C] font-semibold text-xs flex items-center justify-between shadow-lg shadow-black/10 transition transform active:scale-95 no-underline"
               >
-                {/* Logo miniatura discreto */}
                 <div className="flex items-center gap-2">
                   <div className="w-5 h-5 rounded-full bg-[#009EE3]/20 flex items-center justify-center">
                     <span className="text-[9px] font-black text-[#009EE3]">MP</span>
@@ -392,7 +390,7 @@ export const MercadoPagoModal: React.FC<MercadoPagoModalProps> = ({
                   <span>{mpAction.text}</span>
                 </div>
                 <ArrowUpRight className="w-4 h-4 opacity-70" />
-              </button>
+              </a>
 
               {/* Botón Marcar Pagado */}
               <button
