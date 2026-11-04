@@ -1,4 +1,3 @@
-@'
 import { ExpenseItem } from '../types';
 
 export interface MPPaymentOption {
@@ -92,4 +91,3 @@ export async function launchMercadoPago(item: ExpenseItem, onSuccess?: () => voi
     onSuccess();
   }
 }
-'@ | Out-File -FilePath "src\lib\mercadopago.ts" -Encoding utf8
